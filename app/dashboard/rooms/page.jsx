@@ -4,7 +4,16 @@ import { useState } from "react";
 import { RoomsHeader } from "@/components/rooms/rooms-header";
 import { RoomsFilters } from "@/components/rooms/rooms-filters";
 import { RoomsGrid } from "@/components/rooms/rooms-grid";
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 export default function RoomsPage() {
   const [search, setSearch] = useState("");
@@ -28,16 +37,16 @@ export default function RoomsPage() {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
-      className="space-y-6 p-6"
+      className="space-y-6"
     >
       <RoomsHeader />
-      <RoomsFilters 
+      <RoomsFilters
         search={search}
         setSearch={setSearch}
         status={status}
         setStatus={setStatus}
       />
-      <RoomsGrid 
+      <RoomsGrid
         search={search}
         status={status}
         onStartRoom={handleStartRoom}
@@ -49,11 +58,20 @@ export default function RoomsPage() {
             <AlertDialogTitle>Start Assessment Room</AlertDialogTitle>
             <AlertDialogDescription asChild>
               <div>
-                <p>Are you sure you want to start this assessment room? This action cannot be undone.</p>
+                <p>
+                  Are you sure you want to start this assessment room? This
+                  action cannot be undone.
+                </p>
                 {selectedRoom && (
                   <div className="mt-2 space-y-1">
-                    <p><span className="font-medium">Room:</span> {selectedRoom.judul}</p>
-                    <p><span className="font-medium">Participant:</span> {selectedRoom.participant.name}</p>
+                    <p>
+                      <span className="font-medium">Room:</span>{" "}
+                      {selectedRoom.judul}
+                    </p>
+                    <p>
+                      <span className="font-medium">Participant:</span>{" "}
+                      {selectedRoom.participant.name}
+                    </p>
                   </div>
                 )}
               </div>
@@ -61,7 +79,9 @@ export default function RoomsPage() {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleConfirmStart}>Start Room</AlertDialogAction>
+            <AlertDialogAction onClick={handleConfirmStart}>
+              Start Room
+            </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

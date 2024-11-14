@@ -1,11 +1,16 @@
 "use client";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { MapPin, Video } from "lucide-react";
+import { AlertCircleIcon, CheckIcon, MapPin, Video } from "lucide-react";
 import { motion } from "framer-motion";
 import { format } from "date-fns";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Link from "next/link";
 
@@ -18,8 +23,18 @@ const mockSchedule = [
     metodePelaksanaan: "online",
     linkOnline: "https://meet.google.com/abc-defg-hij",
     evaluators: [
-      { id: 1, name: "Dr. John Smith", jabatan: "Senior Evaluator", avatar: "" },
-      { id: 2, name: "Dr. Sarah Johnson", jabatan: "Lead Assessor", avatar: "" },
+      {
+        id: 1,
+        name: "Dr. John Smith",
+        jabatan: "Senior Evaluator",
+        avatar: "",
+      },
+      {
+        id: 2,
+        name: "Dr. Sarah Johnson",
+        jabatan: "Lead Assessor",
+        avatar: "",
+      },
     ],
     schedule: "2024-03-25T10:00:00Z",
     status: "SCHEDULED",
@@ -42,7 +57,7 @@ const mockSchedule = [
   // Add more mock data for different statuses
   {
     id: "3",
-    judul: "Past Assessment",
+    judul: "Peran bidang Fasau dalam Kinerja Unit",
     materi: "Past Evaluation",
     metodePelaksanaan: "online",
     linkOnline: "https://zoom.us/past",
@@ -50,7 +65,7 @@ const mockSchedule = [
       { id: 5, name: "Dr. Past One", jabatan: "Evaluator", avatar: "" },
       { id: 6, name: "Dr. Past Two", jabatan: "Assessor", avatar: "" },
     ],
-    schedule: "2024-02-24T14:00:00Z",
+    schedule: "2024-12-24T14:00:00Z",
     status: "COMPLETED",
     requirementStatus: "COMPLETE",
   },
@@ -81,14 +96,19 @@ const AvatarGroup = ({ evaluators }) => {
                 <Avatar className="h-8 w-8 border-2 border-background">
                   <AvatarImage src={evaluator.avatar} alt={evaluator.name} />
                   <AvatarFallback>
-                    {evaluator.name.split(' ').map(n => n[0]).join('')}
+                    {evaluator.name
+                      .split(" ")
+                      .map((n) => n[0])
+                      .join("")}
                   </AvatarFallback>
                 </Avatar>
               </div>
             </TooltipTrigger>
             <TooltipContent>
               <p>{evaluator.name}</p>
-              <p className="text-xs text-muted-foreground">{evaluator.jabatan}</p>
+              <p className="text-xs text-muted-foreground">
+                {evaluator.jabatan}
+              </p>
             </TooltipContent>
           </Tooltip>
         ))}
@@ -100,13 +120,23 @@ const AvatarGroup = ({ evaluators }) => {
 const RequirementStatus = ({ status }) => {
   return (
     <span
-      className={`text-sm ${
-        status === "COMPLETE" 
-          ? "text-green-600" 
-          : "text-red-600"
+      className={`flex items-center px-2 py-1 text-xs font-medium rounded-full ${
+        status === "COMPLETE"
+          ? "bg-green-100 text-green-600"
+          : "bg-red-100 text-red-600"
       }`}
     >
-      {status === "COMPLETE" ? "Ready to Assessment" : "Lengkapi Persyaratan"}
+      {status === "COMPLETE" ? (
+        <>
+          <CheckIcon className="mr-1 h-4 w-4" />
+          Ready to Assessment
+        </>
+      ) : (
+        <>
+          <AlertCircleIcon className="mr-1 h-4 w-4" />
+          Lengkapi Persyaratan
+        </>
+      )}
     </span>
   );
 };
@@ -114,41 +144,54 @@ const RequirementStatus = ({ status }) => {
 const ScheduleCard = ({ assessment }) => (
   <Link href={`/dashboard/schedule/${assessment.id}`}>
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
+      initial={{ opacity: 0, scale: 0.95 }} // Added scale animation
+      animate={{ opacity: 1, scale: 1 }} // Added scale animation
+      whileTap={{ scale: 0.9 }} // Added click animation
+      whileHover={{ scale: 1.05 }} // Added zoom effect on hover
+      transition={{ duration: 0.2, ease: "easeInOut" }} // Added easing for smoother animation
       className="cursor-pointer"
     >
-      <Card className="hover:shadow-lg transition-shadow">
+      <Card className="rounded-3xl transition-shadow hover:shadow-lg">
         <CardContent className="p-6">
           <div className="space-y-4">
             <div className="flex items-center justify-between">
-              {assessment.metodePelaksanaan === "online" ? (
-                <Video className="h-4 w-4 text-blue-500" />
-              ) : (
-                <MapPin className="h-4 w-4 text-green-500" />
-              )}
+              <div className="flex items-center justify-between">
+                <span
+                  className={`flex items-center space-x-2 rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-800`}
+                >
+                  {assessment.metodePelaksanaan === "online" ? (
+                    <Video className="h-3 w-3" />
+                  ) : (
+                    <MapPin className="h-3 w-3" />
+                  )}
+                  <div>{assessment.metodePelaksanaan.toUpperCase()}</div>
+                </span>
+              </div>
+              <RequirementStatus status={assessment.requirementStatus} />
             </div>
 
             <div>
-              <h3 className="text-xl font-semibold tracking-tight">{assessment.judul}</h3>
-              <p className="text-sm text-muted-foreground">
-                {assessment.metodePelaksanaan === "online" ? assessment.linkOnline : assessment.ruangan}
-              </p>
+              <h3 className="border-b pb-2 font-semibold text-slate-700">
+                {assessment.judul.toUpperCase()}
+              </h3>
             </div>
 
-            <div className="flex flex-col gap-2">
+            <div className="flex gap-2">
               <div className="text-4xl font-bold text-primary">
                 {format(new Date(assessment.schedule), "d MMM")}
               </div>
-              <div className="text-xl">
-                {format(new Date(assessment.schedule), "HH:mm")}
+              <div className="text-4xl text-slate-500">
+                / {format(new Date(assessment.schedule), "HH:mm")}
               </div>
             </div>
 
             <div className="flex items-center justify-between">
               <AvatarGroup evaluators={assessment.evaluators} />
-              <RequirementStatus status={assessment.requirementStatus} />
+              <p className="text-sm text-muted-foreground">
+                {assessment.metodePelaksanaan === "online"
+                  ? assessment.linkOnline
+                  : assessment.ruangan}
+              </p>
             </div>
           </div>
         </CardContent>
@@ -158,28 +201,27 @@ const ScheduleCard = ({ assessment }) => (
 );
 
 export function ScheduleGrid({ search }) {
-  const filteredSchedule = mockSchedule.filter(assessment => 
-    search.toLowerCase() === "" || 
-    assessment.judul.toLowerCase().includes(search.toLowerCase())
+  const filteredSchedule = mockSchedule.filter(
+    (assessment) =>
+      search.toLowerCase() === "" ||
+      assessment.judul.toLowerCase().includes(search.toLowerCase())
   );
 
   const now = new Date();
-  const upcoming = filteredSchedule.filter(a => 
-    new Date(a.schedule) > now && a.status !== "CANCELLED"
+  const upcoming = filteredSchedule.filter(
+    (a) => new Date(a.schedule) > now && a.status !== "CANCELLED"
   );
-  const pending = filteredSchedule.filter(a => 
-    a.requirementStatus === "INCOMPLETE" && a.status !== "CANCELLED"
+  const pending = filteredSchedule.filter(
+    (a) => a.requirementStatus === "INCOMPLETE" && a.status !== "CANCELLED"
   );
-  const past = filteredSchedule.filter(a => 
-    new Date(a.schedule) < now && a.status === "COMPLETED"
+  const past = filteredSchedule.filter(
+    (a) => new Date(a.schedule) < now && a.status === "COMPLETED"
   );
-  const cancelled = filteredSchedule.filter(a => 
-    a.status === "CANCELLED"
-  );
+  const cancelled = filteredSchedule.filter((a) => a.status === "CANCELLED");
 
   return (
     <Tabs defaultValue="upcoming" className="w-full">
-        <TabsList className="">
+      <TabsList className="">
         <TabsTrigger value="upcoming">Upcoming</TabsTrigger>
         <TabsTrigger value="pending">Pending</TabsTrigger>
         <TabsTrigger value="past">Past</TabsTrigger>
@@ -192,7 +234,7 @@ export function ScheduleGrid({ search }) {
             <ScheduleCard key={assessment.id} assessment={assessment} />
           ))}
           {upcoming.length === 0 && (
-            <div className="col-span-full text-center text-muted-foreground py-8">
+            <div className="col-span-full py-8 text-center text-muted-foreground">
               No upcoming assessments
             </div>
           )}
@@ -205,7 +247,7 @@ export function ScheduleGrid({ search }) {
             <ScheduleCard key={assessment.id} assessment={assessment} />
           ))}
           {pending.length === 0 && (
-            <div className="col-span-full text-center text-muted-foreground py-8">
+            <div className="col-span-full py-8 text-center text-muted-foreground">
               No pending assessments
             </div>
           )}
@@ -218,7 +260,7 @@ export function ScheduleGrid({ search }) {
             <ScheduleCard key={assessment.id} assessment={assessment} />
           ))}
           {past.length === 0 && (
-            <div className="col-span-full text-center text-muted-foreground py-8">
+            <div className="col-span-full py-8 text-center text-muted-foreground">
               No past assessments
             </div>
           )}
@@ -231,7 +273,7 @@ export function ScheduleGrid({ search }) {
             <ScheduleCard key={assessment.id} assessment={assessment} />
           ))}
           {cancelled.length === 0 && (
-            <div className="col-span-full text-center text-muted-foreground py-8">
+            <div className="col-span-full py-8 text-center text-muted-foreground">
               No cancelled assessments
             </div>
           )}

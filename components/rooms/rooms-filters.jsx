@@ -1,7 +1,13 @@
 "use client";
 import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { motion } from "framer-motion";
 
 const STATUS_OPTIONS = [
@@ -14,20 +20,20 @@ const STATUS_OPTIONS = [
 
 export function RoomsFilters({ search, setSearch, status, setStatus }) {
   return (
-    <motion.div 
+    <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.1 }}
       className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"
     >
-      <div className="relative w-full max-w-sm">
+      <div className="relative w-full max-w-sm rounded-lg">
         <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
         <Input
           type="text"
           placeholder="Search rooms..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="pl-8"
+          className="rounded-lg pl-8"
         />
       </div>
       <div className="flex gap-2">

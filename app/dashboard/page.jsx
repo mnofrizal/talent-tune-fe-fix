@@ -27,6 +27,7 @@ import {
   YAxis,
 } from "recharts";
 import { Checkbox } from "@/components/ui/checkbox";
+import Link from "next/link";
 
 const formasiData = [
   { name: "IP", value: 80, color: "#459ab0" },
@@ -53,16 +54,18 @@ export default function DashboardPage() {
                   Here's an overview of your assessment activities
                 </p>
               </div>
-              <Button
-                size="lg"
-                className="rounded-xl bg-primary text-primary-foreground hover:bg-primary/90"
-              >
-                Go to Assessments
-              </Button>
+              <Link href="/dashboard/assessments">
+                <Button
+                  size="lg"
+                  className="rounded-xl bg-primary text-primary-foreground hover:bg-primary/90"
+                >
+                  Go to Assessments
+                </Button>
+              </Link>
             </div>
           </div>
 
-          <Card className="w-full rounded-2xl border-none shadow-none">
+          <Card className="w-full rounded-2xl border-gray-100 shadow-sm">
             <CardContent className="flex space-x-6 pt-6">
               <Card className="rounded-2xl shadow-none dark:border-gray-800">
                 <CardContent className="p-6">
@@ -140,7 +143,7 @@ export default function DashboardPage() {
           </Card>
 
           {/* Assessment History Chart */}
-          <Card className="w-full rounded-2xl border-none shadow-none">
+          <Card className="w-full rounded-2xl border-gray-100 shadow-sm">
             <CardHeader>
               <CardTitle className="text-lg">
                 Assessment History (5 Years)
@@ -165,11 +168,19 @@ export default function DashboardPage() {
                 >
                   <XAxis dataKey="year" stroke="#6B7280" />
                   <YAxis stroke="#6B7280" />
-                  <Tooltip />
+                  <Tooltip
+                    contentStyle={{
+                      borderRadius: "8px",
+                      border: "none",
+                      boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+                      zIndex: 1000,
+                    }}
+                    cursor={{ fill: "#f4f6fa", radius: [8, 8, 0, 0] }}
+                  />
                   {/* <Legend /> */}
                   <Bar
                     dataKey="assessments"
-                    fill="#5c98ad"
+                    fill="#102c8e"
                     name="Total Assessments"
                     barSize={60}
                     radius={[8, 8, 0, 0]}
@@ -180,7 +191,7 @@ export default function DashboardPage() {
           </Card>
 
           {/* Recent Assessments */}
-          <Card className="rounded-2xl border-none shadow-none">
+          <Card className="rounded-2xl border-gray-100 shadow-sm">
             <CardHeader>
               <CardTitle className="text-lg">Recent Assessments</CardTitle>
             </CardHeader>
@@ -305,7 +316,7 @@ export default function DashboardPage() {
 
         {/* Right Content - Takes up 1 column */}
         <div className="space-y-6">
-          <Card className="rounded-2xl border-none shadow-none">
+          <Card className="rounded-2xl border-gray-100 shadow-sm">
             <CardContent className="space-y-8 pt-6">
               {/* Formasi Chart Section */}
               <div>
@@ -362,31 +373,16 @@ export default function DashboardPage() {
               </div>
             </CardContent>
           </Card>
-          <Card className="rounded-2xl border-none shadow-none">
+          <Card className="rounded-2xl border-gray-100 shadow-sm">
             <CardContent className="space-y-8 pt-6">
               {/* Upcoming Assessments Section */}
               <div>
                 <h3 className="mb-4 text-lg font-semibold">
                   Upcoming Assessments
                 </h3>
-                <div className="space-y-4">
-                  {[
-                    {
-                      title: "Generalis 2 Bidang Operasi",
-                      date: "Tomorrow at 10:00 AM",
-                      avatar: "TA",
-                    },
-                    {
-                      title: "Generalis 3 Bidang Umum",
-                      date: "Oct 20, 2:00 PM",
-                      avatar: "LA",
-                    },
-                  ].length === 0 ? (
-                    <div className="flex items-center space-x-4 rounded-2xl bg-gray-50 p-6 text-sm text-muted-foreground">
-                      No upcoming assessments
-                    </div>
-                  ) : (
-                    [
+                <Card className="rounded-2xl border-gray-100 bg-gray-50 p-3 py-4 shadow-sm dark:border-gray-800">
+                  <div className="space-y-4">
+                    {[
                       {
                         title: "Generalis 2 Bidang Operasi",
                         date: "Tomorrow at 10:00 AM",
@@ -397,39 +393,57 @@ export default function DashboardPage() {
                         date: "Oct 20, 2:00 PM",
                         avatar: "LA",
                       },
-                    ].map((assessment, index) => (
-                      <div
-                        key={index}
-                        className="flex items-center space-x-4 rounded-2xl border bg-gray-50 p-2"
-                      >
-                        <Avatar>
-                          <AvatarImage
-                            src={`/placeholder.svg?height=60&width=60&text=${assessment.avatar}`}
-                          />
-                          <AvatarFallback>{assessment.avatar}</AvatarFallback>
-                        </Avatar>
-                        <div>
-                          <h4 className="text-sm font-semibold">
-                            {assessment.title}
-                          </h4>
-                          <p className="text-xs text-muted-foreground">
-                            {assessment.date}
-                          </p>
-                        </div>
+                    ].length === 0 ? (
+                      <div className="flex items-center space-x-4 rounded-2xl p-6 text-sm text-muted-foreground">
+                        No upcoming assessments
                       </div>
-                    ))
-                  )}
-                </div>
-                <div className="mt-4 flex justify-center">
-                  <Button
-                    size="lg"
-                    variant="outline"
-                    className="w-full rounded-xl"
-                  >
-                    <ArrowRight className="mr-2 h-4 w-4" />
-                    Go to Room
-                  </Button>
-                </div>
+                    ) : (
+                      [
+                        {
+                          title: "Generalis 2 Bidang Operasi",
+                          date: "Tomorrow at 10:00 AM",
+                          avatar: "TA",
+                        },
+                        {
+                          title: "Generalis 3 Bidang Umum",
+                          date: "Oct 20, 2:00 PM",
+                          avatar: "LA",
+                        },
+                      ].map((assessment, index) => (
+                        <div
+                          key={index}
+                          className="flex items-center space-x-4 border-b pb-3 last:border-none"
+                        >
+                          <Avatar>
+                            <AvatarImage
+                              src={`/placeholder.svg?height=60&width=60&text=${assessment.avatar}`}
+                            />
+                            <AvatarFallback>{assessment.avatar}</AvatarFallback>
+                          </Avatar>
+                          <div>
+                            <h4 className="text-sm font-semibold">
+                              {assessment.title}
+                            </h4>
+                            <p className="text-xs text-muted-foreground">
+                              {assessment.date}
+                            </p>
+                          </div>
+                        </div>
+                      ))
+                    )}
+                  </div>
+
+                  <div className="mt-4 flex justify-center">
+                    <Button
+                      size="lg"
+                      variant="outline"
+                      className="w-full rounded-full"
+                    >
+                      <ArrowRight className="mr-2 h-4 w-4" />
+                      Go to Room
+                    </Button>
+                  </div>
+                </Card>
               </div>
 
               {/* Upcoming Job Vacancies Section */}

@@ -4,9 +4,26 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { MapPin, Wifi, X, Plus } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -15,7 +32,12 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 const mockEvaluators = [
   { id: 1, name: "Dr. John Smith", jabatan: "Senior Evaluator", avatar: "" },
   { id: 2, name: "Dr. Sarah Johnson", jabatan: "Lead Assessor", avatar: "" },
-  { id: 3, name: "Dr. Michael Brown", jabatan: "Technical Evaluator", avatar: "" },
+  {
+    id: 3,
+    name: "Dr. Michael Brown",
+    jabatan: "Technical Evaluator",
+    avatar: "",
+  },
 ];
 
 const mockCandidates = [
@@ -32,6 +54,7 @@ export function NewAssessmentForm() {
   const [formData, setFormData] = useState({
     judul: "",
     materi: "",
+    proyeksi: "",
     metodePelaksanaan: "offline",
     ruangan: "",
     linkOnline: "",
@@ -53,8 +76,13 @@ export function NewAssessmentForm() {
   };
 
   const handleEvaluatorSelect = (evaluatorId) => {
-    const selectedEvaluator = evaluators.find((e) => e.id === parseInt(evaluatorId));
-    if (selectedEvaluator && !formData.evaluators.some((e) => e.id === selectedEvaluator.id)) {
+    const selectedEvaluator = evaluators.find(
+      (e) => e.id === parseInt(evaluatorId)
+    );
+    if (
+      selectedEvaluator &&
+      !formData.evaluators.some((e) => e.id === selectedEvaluator.id)
+    ) {
       setFormData((prev) => ({
         ...prev,
         evaluators: [...prev.evaluators, selectedEvaluator],
@@ -71,7 +99,10 @@ export function NewAssessmentForm() {
 
   const handleUserSelect = (userId) => {
     const selectedUser = candidates.find((u) => u.id === parseInt(userId));
-    if (selectedUser && !formData.participants.some((u) => u.id === selectedUser.id)) {
+    if (
+      selectedUser &&
+      !formData.participants.some((u) => u.id === selectedUser.id)
+    ) {
       setFormData((prev) => ({
         ...prev,
         participants: [...prev.participants, { ...selectedUser, schedule: "" }],
@@ -136,11 +167,12 @@ export function NewAssessmentForm() {
     if (validateStep() && step === 3) {
       try {
         // Simulate API call
-        await new Promise(resolve => setTimeout(resolve, 1000));
+        await new Promise((resolve) => setTimeout(resolve, 1000));
         setIsOpen(false);
         setFormData({
           judul: "",
           materi: "",
+          proyeksi: "",
           metodePelaksanaan: "offline",
           ruangan: "",
           linkOnline: "",
@@ -179,6 +211,26 @@ export function NewAssessmentForm() {
                 onChange={handleInputChange}
                 required
               />
+            </div>
+            <div>
+              <Label htmlFor="proyeksi">Proyeksi</Label>
+              <Select
+                name="proyeksi"
+                value={formData.proyeksi}
+                onValueChange={handleSelectChange("proyeksi")}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Pilih grade" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem key={1} value={"generalis_2"}>
+                    Generalis 2
+                  </SelectItem>
+                  <SelectItem key={2} value={"generalis_3"}>
+                    Generalis 3
+                  </SelectItem>
+                </SelectContent>
+              </Select>
             </div>
             <div>
               <Label>Metode Pelaksanaan</Label>
@@ -394,9 +446,9 @@ export function NewAssessmentForm() {
           <Plus className="mr-2 h-4 w-4" /> New Assessment
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px] md:max-w-[700px]">
+      <DialogContent className="rounded-2xl sm:max-w-[425px] md:max-w-[700px]">
         <DialogTitle className="hidden">Multi-Step Assessment Form</DialogTitle>
-        <Card className="w-full">
+        <Card className="w-full rounded-2xl">
           <CardHeader>
             <CardTitle>
               Step {step} of 3 -{" "}
