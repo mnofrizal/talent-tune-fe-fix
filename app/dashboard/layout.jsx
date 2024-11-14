@@ -14,7 +14,7 @@ export default function DashboardLayout({ children }) {
     <div className="relative min-h-screen bg-background">
       <div className="flex">
         <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
-        <div className="flex-1 md:ml-64">
+        <div className="flex-1 bg-[#f4f6fa] md:ml-64">
           <Navbar onMenuClick={() => setSidebarOpen(true)} />
 
           <AnimatePresence mode="wait">

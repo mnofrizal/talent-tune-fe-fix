@@ -11,6 +11,7 @@ import {
   Calendar,
   Star,
   Zap,
+  Tally1,
 } from "lucide-react";
 
 import { cn } from "@/lib/utils";
@@ -25,12 +26,12 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 
 const Logo = () => (
-  <div className="flex items-center gap-2 px-2">
-    <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary">
+  <div className="flex items-center gap-2 px-2 pt-4">
+    <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#e56c48]">
       <Zap className="h-5 w-5 text-primary-foreground" />
     </div>
     <div className="flex flex-col">
-      <span className="bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-lg font-bold tracking-tight text-transparent">
+      <span className="bg-gradient-to-r from-[#102c8e] to-[#102c8e]/60 bg-clip-text text-lg font-bold tracking-tight text-transparent">
         Talent Tune
       </span>
       <span className="text-xs text-muted-foreground">Management Platform</span>
@@ -74,14 +75,18 @@ const menuItems = [
 ];
 
 const UserInfo = () => (
-  <div className="flex items-center gap-3 border-t px-4 py-3">
-    <Avatar>
+  <div className="flex items-center gap-4 border-t bg-gray-50/50 px-6 py-4">
+    <Avatar className="h-10 w-10 ring-2 ring-white">
       <AvatarImage src="/avatars/01.png" alt="John Doe" />
-      <AvatarFallback>JD</AvatarFallback>
+      <AvatarFallback className="">JD</AvatarFallback>
     </Avatar>
     <div className="flex flex-col">
-      <span className="text-sm font-medium">John Doe</span>
-      <span className="text-xs text-muted-foreground">Senior Developer</span>
+      <span className="font-inter text-sm font-semibold tracking-tight text-gray-900">
+        John Doe
+      </span>
+      <span className="text-xs font-medium text-gray-500">
+        Senior Developer
+      </span>
     </div>
   </div>
 );
@@ -89,7 +94,7 @@ const UserInfo = () => (
 const SidebarContent = ({ pathname, onMenuClick, menuItemCounts }) => (
   <div className="flex h-full flex-col">
     <div className="flex-1 py-2">
-      <nav className="grid gap-1 px-5">
+      <nav className="grid gap-3 px-6">
         {menuItems.map((item, index) => (
           <motion.div
             key={item.href}
@@ -99,17 +104,20 @@ const SidebarContent = ({ pathname, onMenuClick, menuItemCounts }) => (
             <Link
               href={item.href}
               className={cn(
-                "text-muted-foreground group flex items-center rounded-xl px-3 py-3 text-sm font-medium hover:bg-accent hover:text-accent-foreground",
+                "text-muted-foreground group relative flex items-center rounded-xl px-3 py-3 text-sm font-medium hover:bg-[#eef2fe] hover:text-[#102c8e]",
                 pathname === item.href
-                  ? "bg-accent text-accent-foreground"
+                  ? "bg-[#eef2fe] text-[#102c8e] font-semibold"
                   : "transparent"
               )}
               onClick={onMenuClick}
             >
+              {pathname === item.href && (
+                <div className="absolute left-0 top-1/2 h-5 w-1 -translate-y-1/2 rounded-sm bg-[#102c8e]" />
+              )}
               <item.icon
                 className={cn(
-                  "mr-3 h-4 w-4 text-muted-foreground",
-                  pathname === item.href ? "text-accent-foreground" : ""
+                  "mr-3 h-5 w-5 text-muted-foreground",
+                  pathname === item.href ? "text-[#102c8e]" : ""
                 )}
               />
               <div className="flex w-full items-center justify-between">
@@ -166,7 +174,7 @@ export function Sidebar({
         initial={{ x: -300 }}
         animate={{ x: 0 }}
         transition={{ duration: 0.3 }}
-        className="fixed left-0 top-0 z-50 hidden h-screen w-64 border-r bg-background md:block"
+        className="fixed left-0 top-0 z-50 hidden h-screen w-64 border-r bg-[#fbfbfd] md:block"
       >
         <div className="flex h-full flex-col space-y-3">
           <div className="px-4 py-2">

@@ -2,8 +2,8 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import {
+  ArrowRight,
   BarChartIcon,
   CalendarIcon,
   CheckCircleIcon,
@@ -11,22 +11,22 @@ import {
   SunIcon,
   Tally1Icon,
 } from "lucide-react";
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
-import { Poppins } from "next/font/google";
-import { PieChart, Pie, Cell, ResponsiveContainer, Legend } from "recharts";
-import { Checkbox } from "@/components/ui/checkbox";
 
-const poppins = Poppins({
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-});
+import { Poppins } from "next/font/google";
+import {
+  PieChart,
+  Pie,
+  Cell,
+  ResponsiveContainer,
+  Legend,
+  Tooltip,
+  BarChart,
+  Bar,
+  CartesianGrid,
+  XAxis,
+  YAxis,
+} from "recharts";
+import { Checkbox } from "@/components/ui/checkbox";
 
 const formasiData = [
   { name: "IP", value: 80, color: "#459ab0" },
@@ -44,7 +44,7 @@ export default function DashboardPage() {
         <div className="col-span-3 space-y-6">
           {/* Key Metrics */}
           <div className="grid grid-cols-4 gap-6">
-            <div className="col-span-4 mb-2 flex items-start justify-between">
+            <div className="col-span-4 flex items-start justify-between">
               <div className="space-y-1">
                 <h1 className="text-4xl font-medium tracking-tight">
                   Welcome back, Sarah
@@ -55,99 +55,132 @@ export default function DashboardPage() {
               </div>
               <Button
                 size="lg"
-                className="bg-primary text-primary-foreground hover:bg-primary/90"
+                className="rounded-xl bg-primary text-primary-foreground hover:bg-primary/90"
               >
                 Go to Assessments
               </Button>
             </div>
-            <Card className="rounded-2xl border-2 border-gray-100 shadow-none dark:border-gray-800">
-              <CardContent className="p-6">
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <p className="text-sm font-medium text-muted-foreground">
-                      Total Assessments
-                    </p>
-                    <BarChartIcon className="h-4 w-4 text-purple-500" />
-                  </div>
-                  <div className="flex items-baseline space-x-2">
-                    <span className="text-3xl font-semibold">1,081</span>
-                    <span className="text-sm font-medium text-purple-500">
-                      All
-                    </span>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-            <Card className="rounded-2xl border-2 border-gray-100 shadow-none dark:border-gray-800">
-              <CardContent className="p-6">
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <p className="text-sm font-medium text-muted-foreground">
-                      Scheduled Assessments
-                    </p>
-                    <CalendarIcon className="h-4 w-4 text-blue-500" />
-                  </div>
-                  <div className="flex items-baseline space-x-2">
-                    <span className="text-3xl font-semibold">42</span>
-                    <span className="text-sm font-medium text-blue-500">
-                      Upcoming
-                    </span>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-            <Card className="rounded-2xl border-2 border-gray-100 shadow-none dark:border-gray-800">
-              <CardContent className="p-6">
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <p className="text-sm font-medium text-muted-foreground">
-                      In Progress Assessments
-                    </p>
-                    <ClockIcon className="h-4 w-4 text-yellow-500" />
-                  </div>
-                  <div className="flex items-baseline space-x-2">
-                    <span className="text-3xl font-semibold">18</span>
-                    <span className="text-sm font-medium text-yellow-500">
-                      Active
-                    </span>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-            <Card className="rounded-2xl border-2 border-gray-100 shadow-none dark:border-gray-800">
-              <CardContent className="p-6">
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <p className="text-sm font-medium text-muted-foreground">
-                      Completed Assessments
-                    </p>
-                    <CheckCircleIcon className="h-4 w-4 text-green-500" />
-                  </div>
-                  <div className="flex items-baseline space-x-2">
-                    <span className="text-3xl font-semibold">1,021</span>
-                    <span className="text-sm font-medium text-green-500">
-                      +5%
-                    </span>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
           </div>
 
-          {/* Performance Chart */}
-          <Card className="w-full rounded-2xl shadow-none">
+          <Card className="w-full rounded-2xl border-none shadow-none">
+            <CardContent className="flex space-x-6 pt-6">
+              <Card className="rounded-2xl shadow-none dark:border-gray-800">
+                <CardContent className="p-6">
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <p className="text-sm font-medium text-muted-foreground">
+                        Total Assessments
+                      </p>
+                      <BarChartIcon className="h-4 w-4 text-purple-500" />
+                    </div>
+                    <div className="flex items-baseline space-x-2">
+                      <span className="text-3xl font-semibold">1,081</span>
+                      <span className="text-sm font-medium text-purple-500">
+                        All
+                      </span>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+              <Card className="rounded-2xl shadow-none dark:border-gray-800">
+                <CardContent className="p-6">
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <p className="text-sm font-medium text-muted-foreground">
+                        Scheduled Assessments
+                      </p>
+                      <CalendarIcon className="h-4 w-4 text-blue-500" />
+                    </div>
+                    <div className="flex items-baseline space-x-2">
+                      <span className="text-3xl font-semibold">42</span>
+                      <span className="text-sm font-medium text-blue-500">
+                        Upcoming
+                      </span>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+              <Card className="rounded-2xl shadow-none dark:border-gray-800">
+                <CardContent className="p-6">
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <p className="text-sm font-medium text-muted-foreground">
+                        In Progress Assessments
+                      </p>
+                      <ClockIcon className="h-4 w-4 text-yellow-500" />
+                    </div>
+                    <div className="flex items-baseline space-x-2">
+                      <span className="text-3xl font-semibold">18</span>
+                      <span className="text-sm font-medium text-yellow-500">
+                        Active
+                      </span>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+              <Card className="rounded-2xl shadow-none dark:border-gray-800">
+                <CardContent className="p-6">
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <p className="text-sm font-medium text-muted-foreground">
+                        Completed Assessments
+                      </p>
+                      <CheckCircleIcon className="h-4 w-4 text-green-500" />
+                    </div>
+                    <div className="flex items-baseline space-x-2">
+                      <span className="text-3xl font-semibold">1,021</span>
+                      <span className="text-sm font-medium text-green-500">
+                        +5%
+                      </span>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </CardContent>
+          </Card>
+
+          {/* Assessment History Chart */}
+          <Card className="w-full rounded-2xl border-none shadow-none">
             <CardHeader>
-              <CardTitle className="text-lg">Candidate Performance</CardTitle>
+              <CardTitle className="text-lg">
+                Assessment History (5 Years)
+              </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="flex h-[200px] items-center justify-center text-muted-foreground">
-                [Performance Chart Placeholder]
-              </div>
+              <ResponsiveContainer width="100%" height={300}>
+                <BarChart
+                  data={[
+                    { year: 2020, assessments: 15 },
+                    { year: 2021, assessments: 76 },
+                    { year: 2022, assessments: 87 },
+                    { year: 2023, assessments: 87 },
+                    { year: 2024, assessments: 77 },
+                  ]}
+                  margin={{
+                    top: 20,
+                    right: 30,
+                    left: 20,
+                    bottom: 5,
+                  }}
+                >
+                  <XAxis dataKey="year" stroke="#6B7280" />
+                  <YAxis stroke="#6B7280" />
+                  <Tooltip />
+                  {/* <Legend /> */}
+                  <Bar
+                    dataKey="assessments"
+                    fill="#5c98ad"
+                    name="Total Assessments"
+                    barSize={60}
+                    radius={[8, 8, 0, 0]}
+                  />
+                </BarChart>
+              </ResponsiveContainer>
             </CardContent>
           </Card>
 
           {/* Recent Assessments */}
-          <Card className="rounded-2xl shadow-none">
+          <Card className="rounded-2xl border-none shadow-none">
             <CardHeader>
               <CardTitle className="text-lg">Recent Assessments</CardTitle>
             </CardHeader>
@@ -220,7 +253,7 @@ export default function DashboardPage() {
                         <td className="p-4">
                           <div className="inline-flex items-center rounded-md bg-gray-100 px-2 py-1 text-xs font-medium">
                             <div className="mr-1.5 h-1.5 w-1.5 rounded-full bg-green-500" />
-                            <span className="text-green-700">
+                            <span className="text-green-500">
                               {item.status}
                             </span>
                           </div>
@@ -272,110 +305,157 @@ export default function DashboardPage() {
 
         {/* Right Content - Takes up 1 column */}
         <div className="space-y-6">
-          <Card className="rounded-2xl shadow-none">
-            <CardHeader>
-              <CardTitle className="text-lg">Formasi</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <ResponsiveContainer width="100%" height={200}>
-                <PieChart>
-                  <Pie
-                    data={formasiData}
-                    cx="50%"
-                    cy="50%"
-                    innerRadius={60}
-                    outerRadius={90}
-                    fill="#8884d8"
-                    paddingAngle={5}
-                    dataKey="value"
-                  >
-                    {formasiData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.color} />
-                    ))}
-                  </Pie>
-                  <Legend
-                    verticalAlign="middle"
-                    align="right"
-                    layout="vertical"
-                    iconType="circle"
-                    iconSize={8}
-                  />
-                </PieChart>
-              </ResponsiveContainer>
-            </CardContent>
-          </Card>
-
-          <Card className="rounded-2xl shadow-none">
-            <CardHeader>
-              <CardTitle className="text-lg">Upcoming</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {[
-                {
-                  title: "Technical Assessment",
-                  date: "Tomorrow at 10:00 AM",
-                  avatar: "TA",
-                },
-                {
-                  title: "Leadership Assessment",
-                  date: "Oct 20, 2:00 PM",
-                  avatar: "LA",
-                },
-              ].map((assessment, index) => (
-                <Card key={index} className="rounded-lg shadow-sm">
-                  <CardContent className="flex items-center space-x-4 p-4">
-                    <Avatar>
-                      <AvatarImage
-                        src={`/placeholder.svg?height=40&width=40&text=${assessment.avatar}`}
+          <Card className="rounded-2xl border-none shadow-none">
+            <CardContent className="space-y-8 pt-6">
+              {/* Formasi Chart Section */}
+              <div>
+                <h3 className="mb-4 text-lg font-semibold">Formasi</h3>
+                <div className="relative">
+                  <ResponsiveContainer width="100%" height={230}>
+                    <PieChart>
+                      <Pie
+                        data={formasiData}
+                        cx="50%"
+                        cy="50%"
+                        innerRadius={60}
+                        outerRadius={90}
+                        fill="#8884d8"
+                        paddingAngle={5}
+                        dataKey="value"
+                      >
+                        {formasiData.map((entry, index) => (
+                          <Cell key={`cell-${index}`} fill={entry.color} />
+                        ))}
+                      </Pie>
+                      <Legend
+                        verticalAlign="bottom"
+                        align="center"
+                        layout="horizontal"
+                        iconType="circle"
+                        iconSize={8}
+                        wrapperStyle={{
+                          display: "flex",
+                          justifyContent: "center",
+                        }}
                       />
-                      <AvatarFallback>{assessment.avatar}</AvatarFallback>
-                    </Avatar>
-                    <div>
-                      <h4 className="text-sm font-semibold">
-                        {assessment.title}
-                      </h4>
-                      <p className="text-xs text-muted-foreground">
-                        {assessment.date}
-                      </p>
+                      <Tooltip
+                        formatter={(value) => `${value}`}
+                        contentStyle={{
+                          borderRadius: "8px",
+                          border: "none",
+                          boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+                          zIndex: 1000,
+                        }}
+                      />
+                    </PieChart>
+                  </ResponsiveContainer>
+                  <div
+                    className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-center"
+                    style={{ zIndex: 0 }}
+                  >
+                    <div className="text-2xl font-bold">
+                      {formasiData.reduce((sum, item) => sum + item.value, 0)}
                     </div>
-                  </CardContent>
-                </Card>
-              ))}
+                    <div className="text-sm text-muted-foreground">Total</div>
+                  </div>
+                </div>
+              </div>
             </CardContent>
           </Card>
+          <Card className="rounded-2xl border-none shadow-none">
+            <CardContent className="space-y-8 pt-6">
+              {/* Upcoming Assessments Section */}
+              <div>
+                <h3 className="mb-4 text-lg font-semibold">
+                  Upcoming Assessments
+                </h3>
+                <div className="space-y-4">
+                  {[
+                    {
+                      title: "Generalis 2 Bidang Operasi",
+                      date: "Tomorrow at 10:00 AM",
+                      avatar: "TA",
+                    },
+                    {
+                      title: "Generalis 3 Bidang Umum",
+                      date: "Oct 20, 2:00 PM",
+                      avatar: "LA",
+                    },
+                  ].length === 0 ? (
+                    <div className="flex items-center space-x-4 rounded-2xl bg-gray-50 p-6 text-sm text-muted-foreground">
+                      No upcoming assessments
+                    </div>
+                  ) : (
+                    [
+                      {
+                        title: "Generalis 2 Bidang Operasi",
+                        date: "Tomorrow at 10:00 AM",
+                        avatar: "TA",
+                      },
+                      {
+                        title: "Generalis 3 Bidang Umum",
+                        date: "Oct 20, 2:00 PM",
+                        avatar: "LA",
+                      },
+                    ].map((assessment, index) => (
+                      <div
+                        key={index}
+                        className="flex items-center space-x-4 rounded-2xl border bg-gray-50 p-2"
+                      >
+                        <Avatar>
+                          <AvatarImage
+                            src={`/placeholder.svg?height=60&width=60&text=${assessment.avatar}`}
+                          />
+                          <AvatarFallback>{assessment.avatar}</AvatarFallback>
+                        </Avatar>
+                        <div>
+                          <h4 className="text-sm font-semibold">
+                            {assessment.title}
+                          </h4>
+                          <p className="text-xs text-muted-foreground">
+                            {assessment.date}
+                          </p>
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </div>
+                <div className="mt-4 flex justify-center">
+                  <Button
+                    size="lg"
+                    variant="outline"
+                    className="w-full rounded-xl"
+                  >
+                    <ArrowRight className="mr-2 h-4 w-4" />
+                    Go to Room
+                  </Button>
+                </div>
+              </div>
 
-          <Card className="rounded-2xl shadow-none">
-            <CardHeader>
-              <CardTitle className="text-lg">Upcoming Job Vacancies</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-2">
-                <div className="flex items-center justify-between rounded-lg bg-gray-50 p-3">
-                  <div className="flex items-center">
-                    <Tally1Icon className="h-5 w-5 text-gray-400" />
-                    <h4 className="text-sm font-medium">HR Analyst</h4>
-                  </div>
-                  <span className="inline-flex items-center rounded-lg bg-orange-100 px-2.5 py-0.5 text-xs font-medium text-orange-800">
-                    Retirement
-                  </span>
-                </div>
-                <div className="flex items-center justify-between rounded-lg bg-gray-50 p-3">
-                  <div className="flex items-center">
-                    <Tally1Icon className="h-5 w-5 text-gray-400" />
-                    <h4 className="text-sm font-medium">Project Analyst</h4>
-                  </div>
-                  <span className="inline-flex items-center rounded-lg bg-orange-100 px-2.5 py-0.5 text-xs font-medium text-orange-800">
-                    Retirement
-                  </span>
-                </div>
-                <div className="flex items-center justify-between rounded-lg bg-gray-50 p-3">
-                  <div className="flex items-center">
-                    <Tally1Icon className="h-5 w-5 text-gray-400" />
-                    <h4 className="text-sm font-medium">Financial Analyst</h4>
-                  </div>
-                  <span className="inline-flex items-center rounded-lg bg-orange-100 px-2.5 py-0.5 text-xs font-medium text-orange-800">
-                    Retirement
-                  </span>
+              {/* Upcoming Job Vacancies Section */}
+              <div>
+                <h3 className="mb-4 text-lg font-semibold">
+                  Upcoming Job Vacancies
+                </h3>
+                <div className="space-y-2">
+                  {[
+                    "Assistant Manager Sistem Informasi",
+                    "Manager Pengadaan Barang dan Jasa",
+                    "Officer Perencanaan Unit Kerja",
+                  ].map((job, index) => (
+                    <div
+                      key={index}
+                      className="flex items-center justify-between rounded-lg bg-gray-50 p-3"
+                    >
+                      <div className="flex items-center gap-2">
+                        <Tally1Icon className="h-5 w-5 text-gray-400" />
+                        <h4 className="text-sm font-medium">{job}</h4>
+                      </div>
+                      <span className="inline-flex items-center rounded-lg bg-orange-100 px-2.5 py-0.5 text-xs font-medium text-orange-800">
+                        Retirement
+                      </span>
+                    </div>
+                  ))}
                 </div>
               </div>
             </CardContent>
