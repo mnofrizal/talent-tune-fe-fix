@@ -14,19 +14,16 @@ export default function SchedulePage() {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
-      className="space-y-6 p-6"
+      className="space-y-6"
     >
       <ScheduleHeader />
-      <ScheduleFilters 
+      <ScheduleFilters
         search={search}
         setSearch={setSearch}
         status={status}
         setStatus={setStatus}
       />
-      <ScheduleGrid 
-        search={search}
-        status={status}
-      />
+      <ScheduleGrid search={search} status={status} />
     </motion.div>
   );
 }
