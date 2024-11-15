@@ -23,7 +23,7 @@ export function AssessmentInfo() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.2 }}
       >
-        <Card className="">
+        <Card className="border-gray-100 shadow-sm">
           {/* Patient Info Header */}
           <div className="space-y-4">
             <div className="flex items-center justify-between p-4">
@@ -54,7 +54,7 @@ export function AssessmentInfo() {
           <Separator />
           <CardHeader className="pb-4">
             <div className="mb-2 flex items-center justify-between">
-              <CardTitle className="text-2xl font-bold">
+              <CardTitle className="text-xl font-semibold">
                 Fit and Proper Test
               </CardTitle>
               <Badge
