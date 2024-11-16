@@ -1,146 +1,209 @@
-"use client";
-
-import { useState } from "react";
-import { motion } from "framer-motion";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Label } from "@/components/ui/label";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import React, { useState, useEffect } from "react";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { cn } from "@/lib/utils";
+import { Label } from "@/components/ui/label";
+import { Card, CardHeader, CardContent } from "@/components/ui/card";
+import { CheckCircle } from "lucide-react";
 
-const SCORE_OPTIONS = [
-  { value: "1", label: "K" },
-  { value: "2", label: "CK" },
-  { value: "3", label: "CB" },
-  { value: "4", label: "B" },
-];
-
-const evaluationCriteria = [
+const questions = [
   {
-    id: "pemahaman_unit",
-    title: "Pemahaman Unit",
-    description: "Pemahaman peserta terhadap unit kerja dan prosesnya",
+    id: "q-1",
+    title: "Referensi",
+    description:
+      "Pemahaman Keputusan Direksi No. 204.K/010/IP/2019 tentang Kebijakan mengenai Anti Penyuapan di PT Indonesia Power.",
   },
   {
-    id: "pemahaman_bidang",
+    id: "q-2",
     title: "Pemahaman Bidang Kerja",
-    description: "Pemahaman peserta terhadap bidang kerja dan tanggung jawabnya",
-  },
-  {
-    id: "sikap",
-    title: "Sikap/Attitude",
-    description: "Penilaian terhadap sikap dan perilaku peserta",
-  },
-  {
-    id: "komunikasi",
-    title: "Keterampilan Komunikasi",
-    description: "Kemampuan peserta dalam berkomunikasi dan menyampaikan informasi",
+    description:
+      "Pemahaman peserta terhadap bidang kerja dan tanggung jawabnya",
   },
 ];
 
-const ScoreCard = ({ criteriaId, value, onChange, disabled = false }) => (
-  <RadioGroup
-    value={value}
-    onValueChange={onChange}
-    className="grid grid-cols-4 gap-2"
-    disabled={disabled}
-  >
-    {SCORE_OPTIONS.map((option) => (
-      <div key={option.value}>
-        <RadioGroupItem
-          value={option.value}
-          id={`${criteriaId}-${option.value}`}
-          className="peer sr-only"
-        />
-        <Label
-          htmlFor={`${criteriaId}-${option.value}`}
-          className={cn(
-            "flex flex-col items-center justify-center rounded-lg border-2 border-muted bg-popover p-4",
-            "hover:bg-accent hover:text-accent-foreground",
-            "peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary/5",
-            "[&:has([data-state=checked])]:border-primary cursor-pointer"
-          )}
-        >
-          <span className="text-xl font-bold">{option.label}</span>
-          <span className="text-xs text-muted-foreground mt-1">({option.value})</span>
-        </Label>
-      </div>
-    ))}
-  </RadioGroup>
-);
+const ratingOptions = [
+  { value: "K", label: "K", number: "(1)" },
+  { value: "CK", label: "CK", number: "(2)" },
+  { value: "CB", label: "CB", number: "(3)" },
+  { value: "B", label: "B", number: "(4)" },
+];
 
 export function EvaluationForm({ id }) {
-  const [scores, setScores] = useState({});
-  const [comments, setComments] = useState({});
+  const [states, setStates] = useState(
+    Object.fromEntries(questions.map((q) => [q.id, { rating: "", notes: "" }]))
+  );
+  const [initialStates, setInitialStates] = useState(
+    Object.fromEntries(questions.map((q) => [q.id, { rating: "", notes: "" }]))
+  );
+  const [completed, setCompleted] = useState(
+    Object.fromEntries(questions.map((q) => [q.id, false]))
+  );
   const [conclusion, setConclusion] = useState("");
+  const [canSubmit, setCanSubmit] = useState(false);
+  const [openItem, setOpenItem] = useState(undefined);
+  const [triggerClose, setTriggerClose] = useState(false);
 
-  const handleScoreChange = (criteriaId, value) => {
-    setScores((prev) => ({ ...prev, [criteriaId]: value }));
+  useEffect(() => {
+    setCanSubmit(Object.values(completed).every(Boolean));
+  }, [completed]);
+
+  useEffect(() => {
+    if (triggerClose) {
+      setOpenItem(undefined);
+      setTriggerClose(false);
+    }
+  }, [triggerClose]);
+
+  const handleSave = (questionId) => {
+    setCompleted((prev) => ({ ...prev, [questionId]: true }));
+    setInitialStates((prev) => ({
+      ...prev,
+      [questionId]: { ...states[questionId] },
+    }));
+    setTriggerClose(true);
   };
 
-  const handleCommentChange = (criteriaId, value) => {
-    setComments((prev) => ({ ...prev, [criteriaId]: value }));
+  const isSaveEnabled = (questionId) => {
+    const currentState = states[questionId];
+    const initialState = initialStates[questionId];
+    return (
+      currentState.rating !== "" &&
+      (currentState.rating !== initialState.rating ||
+        currentState.notes !== initialState.notes)
+    );
+  };
+
+  const handleChange = (questionId, field, value) => {
+    setStates((prev) => ({
+      ...prev,
+      [questionId]: { ...prev[questionId], [field]: value },
+    }));
+    setCompleted((prev) => ({ ...prev, [questionId]: false }));
   };
 
   return (
-    <div className="space-y-6">
-      {evaluationCriteria.map((criteria, index) => (
-        <motion.div
-          key={criteria.id}
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: index * 0.1 }}
-        >
-          <Card>
-            <CardHeader>
-              <CardTitle>{criteria.title}</CardTitle>
+    <div className="w-full max-w-3xl space-y-6">
+      <h1 className="text-2xl font-bold">Evaluation Form</h1>
+
+      <Accordion
+        type="single"
+        collapsible
+        value={openItem}
+        onValueChange={setOpenItem}
+        className="w-full space-y-4"
+        key={triggerClose ? "closed" : "open"}
+      >
+        {questions.map((question, index) => (
+          <AccordionItem
+            key={question.id}
+            value={question.id}
+            className="rounded-lg border px-6"
+          >
+            <AccordionTrigger className="py-4 text-lg font-semibold">
+              <span className="flex items-center gap-3">
+                <span className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-50 text-sm text-blue-600">
+                  {index + 1}
+                </span>
+                {question.title}
+                {completed[question.id] && (
+                  <CheckCircle className="h-5 w-5 text-green-500" />
+                )}
+              </span>
+            </AccordionTrigger>
+            <AccordionContent className="space-y-6 pb-6">
               <p className="text-sm text-muted-foreground">
-                {criteria.description}
+                {question.description}
               </p>
-            </CardHeader>
-            <CardContent className="space-y-6">
+
               <div className="space-y-4">
-                <Label>Penilaian</Label>
-                <ScoreCard
-                  criteriaId={criteria.id}
-                  value={scores[criteria.id] || ""}
-                  onChange={(value) => handleScoreChange(criteria.id, value)}
-                />
+                <Label className="text-sm font-medium">Penilaian</Label>
+                <div className="flex gap-4">
+                  {ratingOptions.map((option) => (
+                    <div key={option.value} className="flex-1">
+                      <input
+                        type="radio"
+                        id={`${question.id}-${option.value}`}
+                        name={`${question.id}-rating`}
+                        value={option.value}
+                        checked={states[question.id].rating === option.value}
+                        onChange={() =>
+                          handleChange(question.id, "rating", option.value)
+                        }
+                        className="sr-only"
+                      />
+                      <label
+                        htmlFor={`${question.id}-${option.value}`}
+                        className={`flex flex-col items-center justify-center h-full p-4 border rounded-lg cursor-pointer transition-all ${
+                          states[question.id].rating === option.value
+                            ? "border-primary bg-primary/5"
+                            : "border-gray-200 hover:border-primary/50"
+                        }`}
+                      >
+                        <div className="flex flex-col items-center gap-1">
+                          <span className="text-sm font-medium">
+                            {option.label}
+                          </span>
+                          <span className="text-xs text-gray-500">
+                            {option.number}
+                          </span>
+                        </div>
+                      </label>
+                    </div>
+                  ))}
+                </div>
               </div>
 
               <div className="space-y-2">
-                <Label>Catatan</Label>
+                <Label
+                  htmlFor={`notes-${question.id}`}
+                  className="text-sm font-medium"
+                >
+                  Catatan (Opsional)
+                </Label>
                 <Textarea
-                  value={comments[criteria.id] || ""}
-                  onChange={(e) => handleCommentChange(criteria.id, e.target.value)}
+                  id={`notes-${question.id}`}
                   placeholder="Tambahkan catatan di sini..."
-                  className="min-h-[80px]"
+                  className="min-h-[100px]"
+                  value={states[question.id].notes}
+                  onChange={(e) =>
+                    handleChange(question.id, "notes", e.target.value)
+                  }
                 />
               </div>
-            </CardContent>
-          </Card>
-        </motion.div>
-      ))}
 
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: evaluationCriteria.length * 0.1 }}
-      >
-        <Card>
-          <CardHeader>
-            <CardTitle>Kesimpulan & Rekomendasi</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Textarea
-              value={conclusion}
-              onChange={(e) => setConclusion(e.target.value)}
-              placeholder="Tuliskan kesimpulan dan rekomendasi..."
-              className="min-h-[140px]"
-            />
-          </CardContent>
-        </Card>
-      </motion.div>
+              <Button
+                onClick={() => handleSave(question.id)}
+                disabled={!isSaveEnabled(question.id)}
+              >
+                {completed[question.id] ? "Saved" : "Save"}
+              </Button>
+            </AccordionContent>
+          </AccordionItem>
+        ))}
+      </Accordion>
+
+      <Card className="rounded-lg border">
+        <CardHeader>
+          <h2 className="text-xl font-semibold">Kesimpulan & Rekomendasi</h2>
+        </CardHeader>
+        <CardContent>
+          <Textarea
+            placeholder="Tuliskan kesimpulan dan rekomendasi..."
+            className="min-h-[150px]"
+            value={conclusion}
+            onChange={(e) => setConclusion(e.target.value)}
+          />
+        </CardContent>
+      </Card>
+
+      <div className="flex justify-end">
+        <Button disabled={!canSubmit}>Submit Evaluation</Button>
+      </div>
     </div>
   );
 }
