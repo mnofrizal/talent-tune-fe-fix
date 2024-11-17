@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { motion } from "framer-motion";
+import { signIn } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
@@ -30,16 +31,23 @@ export default function LoginPage() {
     }
 
     try {
-      // For demo purposes, using hardcoded credentials
-      if (email === "admin@example.com" && password === "password") {
-        toast({
-          title: "Success",
-          description: "Welcome back!",
-        });
-        router.push("/dashboard");
-      } else {
+      const result = await signIn("credentials", {
+        email,
+        password,
+        redirect: false,
+      });
+
+      if (result?.error) {
         throw new Error("Invalid email or password");
       }
+
+      toast({
+        title: "Success",
+        description: "Welcome back!",
+      });
+
+      router.push("/dashboard");
+      router.refresh();
     } catch (err) {
       setError(err.message);
       toast({
@@ -89,6 +97,7 @@ export default function LoginPage() {
             <Button
               variant="outline"
               className="w-full rounded-full py-6 font-semibold"
+              onClick={() => signIn("google")}
             >
               <svg
                 className="mr-2 h-4 w-4"

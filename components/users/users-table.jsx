@@ -18,58 +18,60 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { ChevronDown, Edit, Trash2 } from "lucide-react";
 import { motion } from "framer-motion";
-import { toast } from "sonner";
+import { useToast } from "@/hooks/use-toast"; // Updated import for toast
 import { Card } from "../ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
+import { useAuth } from "@/hooks/use-auth";
+import { API_ENDPOINTS } from "@/config/api";
 
-// Mock users data
-const mockUsers = [
-  {
-    id: 1,
-    name: "John Doe",
-    email: "john@example.com",
-    phone: "+1234567890",
-    nip: "901335140I",
-    role: "ADMINISTRATOR",
-    jabatan: "Senior Manager Bidang umum",
-    bidang: "Fasilitas dan Sarana",
-  },
-  {
-    id: 2,
-    name: "Jane Smith",
-    email: "jane@example.com",
-    phone: "+1987654321",
-    nip: "901335140I",
-    role: "USER",
-    jabatan: "Team Lead Pemeliharaan Sipil Unit",
-    bidang: "Sekretariat",
-  },
-  {
-    id: 3,
-    name: "FITRI NUUR JANNAH",
-    email: "bob@example.com",
-    phone: "+1122334455",
-    nip: "901335140I",
-    role: "EVALUATOR",
-    jabatan: "Senior Evaluator",
-    bidang: "Perencanaan Unit Kerja",
-  },
-];
-
-export function UsersTable({ search, roleFilter }) {
-  const filteredUsers = mockUsers.filter((user) => {
+export function UsersTable({ users, search, roleFilter, refreshUsers }) {
+  const { session } = useAuth(); // Accessing session from useAuth
+  const { toast } = useToast(); // Initialize toast
+  const filteredUsers = users.filter((user) => {
     const matchesSearch =
       search.toLowerCase() === "" ||
       user.name.toLowerCase().includes(search.toLowerCase()) ||
       user.email.toLowerCase().includes(search.toLowerCase());
 
-    const matchesRole = roleFilter === "All" || user.role === roleFilter;
+    const matchesRole = roleFilter === "All" || user.systemRole === roleFilter;
 
     return matchesSearch && matchesRole;
   });
 
-  const handleDeleteUser = (userId) => {
-    toast.success("User deleted successfully");
+  const handleDeleteUser = async (userId) => {
+    console.log({ userId });
+    try {
+      const response = await fetch(`${API_ENDPOINTS.USERS.LIST}/${userId}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${session?.accessToken}`, // Using session.accessToken
+        },
+      });
+
+      if (response.ok) {
+        toast({
+          variant: "default",
+          title: "Success",
+          description: "User deleted successfully",
+          duration: 3000,
+        });
+        refreshUsers(); // Call the refresh function to update the user list
+      } else {
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: result.message || "Failed to delete user",
+          duration: 3000,
+        });
+      }
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: error.message || "Failed to delete user",
+        duration: 3000,
+      });
+    }
   };
 
   return (
@@ -84,7 +86,6 @@ export function UsersTable({ search, roleFilter }) {
           <TableHeader>
             <TableRow>
               <TableHead>Name</TableHead>
-
               <TableHead>Phone</TableHead>
               <TableHead>NIP</TableHead>
               <TableHead>Role</TableHead>
@@ -125,7 +126,7 @@ export function UsersTable({ search, roleFilter }) {
 
                   <TableCell>{user.phone}</TableCell>
                   <TableCell>{user.nip}</TableCell>
-                  <TableCell>{user.role}</TableCell>
+                  <TableCell>{user.systemRole}</TableCell>
                   <TableCell>{user.jabatan}</TableCell>
                   <TableCell>{user.bidang}</TableCell>
                   <TableCell>

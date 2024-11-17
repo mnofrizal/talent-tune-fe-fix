@@ -8,7 +8,6 @@ import {
   FileUp,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-
 export function RequirementItem({
   requirement,
   isCompleted,
@@ -41,6 +40,8 @@ export function RequirementItem({
           className={`text-lg font-medium ${
             isDisabled && requirement.title !== "Attendance Confirmation"
               ? "text-red-600 line-through"
+              : isCompleted && requirement.title === "Attendance Confirmation"
+              ? "line-through text-green-600"
               : isCompleted
               ? "line-through text-muted-foreground"
               : ""
@@ -57,23 +58,24 @@ export function RequirementItem({
             "Upload your presentation slides for review."}
         </p>
         <div className="mt-3">
-          {requirement.title === "Upload PPT" && uploadedPPT && (
-            <div className="mb-2 flex items-center gap-2">
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <FileIcon className="h-4 w-4" />
-                <span>{uploadedPPT}</span>
+          {requirement.title === "Upload PPT" &&
+            (isCompleted || uploadedPPT) && (
+              <div className="mb-2 flex items-center gap-2">
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <FileIcon className="h-4 w-4" />
+                  <span>{uploadedPPT}</span>
+                </div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="ml-auto"
+                  onClick={openDialog}
+                  disabled={isDisabled}
+                >
+                  Change
+                </Button>
               </div>
-              <Button
-                variant="outline"
-                size="sm"
-                className="ml-auto"
-                onClick={openDialog}
-                disabled={isDisabled}
-              >
-                Change
-              </Button>
-            </div>
-          )}
+            )}
           <Button
             variant={isCompleted ? "outline" : "outline"}
             className="gap-2 border-primary text-primary hover:bg-primary/5 hover:text-primary"
@@ -89,7 +91,8 @@ export function RequirementItem({
                 <Download className="h-4 w-4" />
                 Download PDF
               </>
-            ) : requirement.title === "Upload PPT" && uploadedPPT ? (
+            ) : requirement.title === "Upload PPT" &&
+              (isCompleted || uploadedPPT) ? (
               <>
                 <Download className="h-4 w-4" />
                 Download

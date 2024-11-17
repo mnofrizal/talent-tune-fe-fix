@@ -22,6 +22,7 @@ import {
 } from "@/components/ui/sheet";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
+import { useAuth } from "@/hooks/use-auth"; // Importing useAuth hook
 
 const Logo = () => (
   <div className="flex items-center gap-2 px-2 pt-4">
@@ -68,7 +69,6 @@ const userMenuItems = [
     icon: DoorOpen,
     count: 0,
   },
-
   {
     title: "Penilaian",
     href: "/dashboard/penilaian",
@@ -76,19 +76,19 @@ const userMenuItems = [
   },
 ];
 
-const UserInfo = () => (
+const UserInfo = (
+  { name, role } // Accepting name and role as props
+) => (
   <div className="flex items-center gap-4 border-t bg-gray-50/50 px-6 py-4">
     <Avatar className="h-10 w-10 ring-2 ring-white">
-      <AvatarImage src="/avatars/01.png" alt="John Doe" />
-      <AvatarFallback className="">JD</AvatarFallback>
+      <AvatarImage src="/avatars/01.png" alt={name} />
+      <AvatarFallback>{name ? name.charAt(0) : "JD"}</AvatarFallback>
     </Avatar>
     <div className="flex flex-col">
       <span className="font-inter text-sm font-semibold tracking-tight text-gray-900">
-        John Doe
+        {name}
       </span>
-      <span className="text-xs font-medium text-gray-500">
-        Senior Developer
-      </span>
+      <span className="text-xs font-medium text-gray-500">{role}</span>
     </div>
   </div>
 );
@@ -148,7 +148,7 @@ const MenuSection = ({
   </div>
 );
 
-const SidebarContent = ({ pathname, onMenuClick, menuItemCounts }) => (
+const SidebarContent = ({ pathname, onMenuClick, menuItemCounts, user }) => (
   <div className="flex h-full flex-col">
     <div className="flex-1 space-y-6 py-2">
       <MenuSection
@@ -166,7 +166,8 @@ const SidebarContent = ({ pathname, onMenuClick, menuItemCounts }) => (
         menuItemCounts={menuItemCounts}
       />
     </div>
-    <UserInfo />
+    <UserInfo name={user?.name || "Guest"} role={user?.systemRole || "User"} />{" "}
+    {/* Using dynamic name and role */}
   </div>
 );
 
@@ -179,6 +180,7 @@ export function Sidebar({
   },
 }) {
   const pathname = usePathname();
+  const { user } = useAuth(); // Using useAuth to get user data
 
   return (
     <>
@@ -192,6 +194,7 @@ export function Sidebar({
             pathname={pathname}
             onMenuClick={onClose}
             menuItemCounts={menuItemCounts}
+            user={user} // Passing user data to SidebarContent
           />
         </SheetContent>
       </Sheet>
@@ -210,6 +213,7 @@ export function Sidebar({
             pathname={pathname}
             onMenuClick={() => {}}
             menuItemCounts={menuItemCounts}
+            user={user} // Passing user data to SidebarContent
           />
         </div>
       </motion.div>

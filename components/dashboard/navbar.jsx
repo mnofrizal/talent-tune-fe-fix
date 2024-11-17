@@ -4,10 +4,11 @@ import * as React from "react";
 import { Bell, Menu, ChevronRight, Search } from "lucide-react";
 import { motion } from "framer-motion";
 import { usePathname } from "next/navigation";
-import { UserNav } from "@/components/dashboard/user-nav";
+import { UserNav } from "./user-nav";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { ModeToggle } from "@/components/mode-toggle";
+import { useAuth } from "@/hooks/use-auth";
 import {
   CommandDialog,
   CommandEmpty,
@@ -31,6 +32,7 @@ export function Navbar({ onMenuClick }) {
   const pathname = usePathname();
   const segments = getPathSegments(pathname);
   const [open, setOpen] = React.useState(false);
+  const { user, loading } = useAuth();
 
   React.useEffect(() => {
     const down = (e) => {
@@ -43,6 +45,21 @@ export function Navbar({ onMenuClick }) {
     document.addEventListener("keydown", down);
     return () => document.removeEventListener("keydown", down);
   }, []);
+
+  if (loading) {
+    return (
+      <motion.header
+        className="sticky top-0 z-40 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60"
+        initial={{ y: -100 }}
+        animate={{ y: 0 }}
+        transition={{ duration: 0.3 }}
+      >
+        <div className="flex h-16 items-center px-4">
+          <div className="h-8 w-full animate-pulse rounded bg-muted" />
+        </div>
+      </motion.header>
+    );
+  }
 
   return (
     <motion.header
@@ -118,10 +135,12 @@ export function Navbar({ onMenuClick }) {
 
         <div className="flex items-center justify-end space-x-2 md:space-x-4">
           <nav className="flex items-center space-x-2">
-            <Button variant="ghost" size="icon" className="hidden md:flex">
-              <Bell className="h-5 w-5" />
-              <span className="sr-only">Notifications</span>
-            </Button>
+            {user && (
+              <Button variant="ghost" size="icon" className="hidden md:flex">
+                <Bell className="h-5 w-5" />
+                <span className="sr-only">Notifications</span>
+              </Button>
+            )}
             <ModeToggle />
             <UserNav />
           </nav>

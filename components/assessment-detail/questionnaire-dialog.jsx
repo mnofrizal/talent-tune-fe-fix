@@ -30,6 +30,7 @@ export function QuestionnaireDialog({ open, onOpenChange, onComplete }) {
   };
 
   const handleSubmit = () => {
+    console.log({ answers });
     onComplete(answers);
   };
 

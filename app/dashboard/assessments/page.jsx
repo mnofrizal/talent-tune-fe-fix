@@ -3,14 +3,48 @@ import { AssessmentHeader } from "@/components/assessment/assessment-header";
 import { AssessmentFilters } from "@/components/assessment/assessment-filters";
 import { AssessmentTable } from "@/components/assessment/assessment-table";
 import { motion } from "framer-motion";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import AssessmentStastics from "@/components/assessment/assesment-statistics";
+import { useAuth } from "@/hooks/use-auth";
+import { API_ENDPOINTS } from "@/config/api";
 
 export default function AssessmentPage() {
+  const { session } = useAuth(); // Accessing session from useAuth
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState("All");
   const [currentPage, setCurrentPage] = useState(1);
+  const [assessments, setAssessments] = useState([]);
+
+  const fetchAssessments = async () => {
+    try {
+      const response = await fetch(API_ENDPOINTS.ASSESSMENTS.LIST, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${session?.accessToken}`, // Using session.accessToken
+        },
+      });
+      if (!response.ok) {
+        throw new Error("Failed to fetch users");
+      }
+      const result = await response.json();
+
+      if (result.success) {
+        setAssessments(result.data);
+        console.log(result.data);
+      } else {
+        console.error(result.message);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  useEffect(() => {
+    if (session) {
+      fetchAssessments();
+    }
+  }, [session]);
 
   return (
     <motion.div
@@ -19,8 +53,8 @@ export default function AssessmentPage() {
       transition={{ duration: 0.5 }}
       className="space-y-6"
     >
-      <AssessmentHeader />
-      <AssessmentStastics />
+      <AssessmentHeader onAssessmentCreated={fetchAssessments} />
+      <AssessmentStastics assessments={assessments} />
       <Card className="w-full rounded-2xl border-gray-100 shadow-sm">
         <CardHeader>
           <AssessmentFilters
@@ -32,6 +66,7 @@ export default function AssessmentPage() {
         </CardHeader>
         <CardContent>
           <AssessmentTable
+            assessments={assessments} // Pass the assessments data here
             search={search}
             status={status}
             currentPage={currentPage}

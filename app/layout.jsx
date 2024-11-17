@@ -2,6 +2,7 @@ import { Providers } from "@/components/providers";
 import localFont from "next/font/local";
 import "./globals.css";
 import { Inter, Plus_Jakarta_Sans, Poppins } from "next/font/google";
+import { Toaster } from "@/components/ui/toaster";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -43,8 +44,9 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${inter.className}  antialiased `}>
+      <body className={`${inter.className} antialiased`}>
         <Providers>{children}</Providers>
+        <Toaster />
       </body>
     </html>
   );

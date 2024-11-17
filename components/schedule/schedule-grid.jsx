@@ -1,6 +1,5 @@
 "use client";
 import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { AlertCircleIcon, CheckIcon, MapPin, Video } from "lucide-react";
 import { motion } from "framer-motion";
 import { format } from "date-fns";
@@ -14,89 +13,21 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Link from "next/link";
 
-// Mock data for current user's assessments
-const mockSchedule = [
-  {
-    id: "1",
-    judul: "Leadership Assessment",
-    materi: "Leadership Skills Evaluation",
-    metodePelaksanaan: "online",
-    linkOnline: "https://meet.google.com/abc-defg-hij",
-    evaluators: [
-      {
-        id: 1,
-        name: "Dr. John Smith",
-        jabatan: "Senior Evaluator",
-        avatar: "",
-      },
-      {
-        id: 2,
-        name: "Dr. Sarah Johnson",
-        jabatan: "Lead Assessor",
-        avatar: "",
-      },
-    ],
-    schedule: "2024-03-25T10:00:00Z",
-    status: "SCHEDULED",
-    requirementStatus: "INCOMPLETE",
-  },
-  {
-    id: "2",
-    judul: "Technical Assessment",
-    materi: "Technical Skills Evaluation",
-    metodePelaksanaan: "offline",
-    ruangan: "Room A-101",
-    evaluators: [
-      { id: 3, name: "Dr. Emily White", jabatan: "Technical Lead", avatar: "" },
-      { id: 4, name: "Dr. David Lee", jabatan: "Senior Assessor", avatar: "" },
-    ],
-    schedule: "2024-03-24T14:00:00Z",
-    status: "IN_PROGRESS",
-    requirementStatus: "COMPLETE",
-  },
-  // Add more mock data for different statuses
-  {
-    id: "3",
-    judul: "Peran bidang Fasau dalam Kinerja Unit",
-    materi: "Past Evaluation",
-    metodePelaksanaan: "online",
-    linkOnline: "https://zoom.us/past",
-    evaluators: [
-      { id: 5, name: "Dr. Past One", jabatan: "Evaluator", avatar: "" },
-      { id: 6, name: "Dr. Past Two", jabatan: "Assessor", avatar: "" },
-    ],
-    schedule: "2024-12-24T14:00:00Z",
-    status: "COMPLETED",
-    requirementStatus: "COMPLETE",
-  },
-  {
-    id: "4",
-    judul: "Cancelled Assessment",
-    materi: "Cancelled Evaluation",
-    metodePelaksanaan: "offline",
-    ruangan: "Room X-101",
-    evaluators: [
-      { id: 7, name: "Dr. Cancel One", jabatan: "Evaluator", avatar: "" },
-      { id: 8, name: "Dr. Cancel Two", jabatan: "Assessor", avatar: "" },
-    ],
-    schedule: "2024-03-30T14:00:00Z",
-    status: "CANCELLED",
-    requirementStatus: "INCOMPLETE",
-  },
-];
-
-const AvatarGroup = ({ evaluators }) => {
+const AvatarGroup = ({ evaluations }) => {
   return (
     <div className="flex -space-x-2">
       <TooltipProvider>
-        {evaluators.map((evaluator) => (
-          <Tooltip key={evaluator.id}>
+        {evaluations.map((evaluation) => (
+          <Tooltip key={evaluation.id}>
             <TooltipTrigger asChild>
               <div className="relative">
                 <Avatar className="h-8 w-8 border-2 border-background">
-                  <AvatarImage src={evaluator.avatar} alt={evaluator.name} />
+                  <AvatarImage
+                    src={`/avatars/${evaluation.evaluator.nip}.jpg`}
+                    alt={evaluation.evaluator.name}
+                  />
                   <AvatarFallback>
-                    {evaluator.name
+                    {evaluation.evaluator.name
                       .split(" ")
                       .map((n) => n[0])
                       .join("")}
@@ -105,9 +36,9 @@ const AvatarGroup = ({ evaluators }) => {
               </div>
             </TooltipTrigger>
             <TooltipContent>
-              <p>{evaluator.name}</p>
+              <p>{evaluation.evaluator.name}</p>
               <p className="text-xs text-muted-foreground">
-                {evaluator.jabatan}
+                {evaluation.evaluator.jabatan || "Evaluator"}
               </p>
             </TooltipContent>
           </Tooltip>
@@ -117,16 +48,19 @@ const AvatarGroup = ({ evaluators }) => {
   );
 };
 
-const RequirementStatus = ({ status }) => {
+const RequirementStatus = ({ assessment }) => {
+  const isComplete =
+    assessment?.presentationFile !== null &&
+    assessment?.attendanceConfirmation === true &&
+    assessment?.questionnaireResponses !== null;
+
   return (
     <span
       className={`flex items-center px-2 py-1 text-xs font-medium rounded-full ${
-        status === "COMPLETE"
-          ? "bg-green-100 text-green-600"
-          : "bg-red-100 text-red-600"
+        isComplete ? "bg-green-100 text-green-600" : "bg-red-100 text-red-600"
       }`}
     >
-      {status === "COMPLETE" ? (
+      {isComplete ? (
         <>
           <CheckIcon className="mr-1 h-4 w-4" />
           Ready to Assessment
@@ -141,89 +75,100 @@ const RequirementStatus = ({ status }) => {
   );
 };
 
-const ScheduleCard = ({ assessment }) => (
-  <Link href={`/dashboard/schedule/${assessment.id}`}>
-    <motion.div
-      initial={{ opacity: 0, scale: 0.95 }} // Added scale animation
-      animate={{ opacity: 1, scale: 1 }} // Added scale animation
-      whileTap={{ scale: 0.9 }} // Added click animation
-      whileHover={{ scale: 1.05 }} // Added zoom effect on hover
-      transition={{ duration: 0.2, ease: "easeInOut" }} // Added easing for smoother animation
-      className="cursor-pointer"
-    >
-      <Card className="rounded-3xl transition-shadow hover:shadow-lg">
-        <CardContent className="p-6">
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
+const ScheduleCard = ({ assessment }) => {
+  return (
+    <Link href={`/dashboard/schedule/${assessment.id}`}>
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        whileTap={{ scale: 0.9 }}
+        whileHover={{ scale: 1.05 }}
+        transition={{ duration: 0.2, ease: "easeInOut" }}
+        className="cursor-pointer"
+      >
+        <Card className="rounded-3xl transition-shadow hover:shadow-lg">
+          <CardContent className="p-6">
+            <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <span
-                  className={`flex items-center space-x-2 rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-800`}
-                >
-                  {assessment.metodePelaksanaan === "online" ? (
-                    <Video className="h-3 w-3" />
-                  ) : (
-                    <MapPin className="h-3 w-3" />
-                  )}
-                  <div>{assessment.metodePelaksanaan.toUpperCase()}</div>
-                </span>
+                <div className="flex items-center justify-between">
+                  <span
+                    className={`flex items-center space-x-2 rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-800`}
+                  >
+                    {assessment.metodePelaksanaan.toLowerCase() === "online" ? (
+                      <Video className="h-3 w-3" />
+                    ) : (
+                      <MapPin className="h-3 w-3" />
+                    )}
+                    <div>{assessment.metodePelaksanaan}</div>
+                  </span>
+                </div>
+                <RequirementStatus assessment={assessment} />
               </div>
-              <RequirementStatus status={assessment.requirementStatus} />
-            </div>
 
-            <div>
-              <h3 className="border-b pb-2 font-semibold text-slate-700">
-                {assessment.judul.toUpperCase()}
-              </h3>
-            </div>
-
-            <div className="flex gap-2">
-              <div className="text-4xl font-bold text-primary">
-                {format(new Date(assessment.schedule), "d MMM")}
+              <div>
+                <h3 className="border-b pb-2 font-semibold text-slate-700">
+                  {assessment.judul.toUpperCase()}
+                </h3>
               </div>
-              <div className="text-4xl text-slate-500">
-                / {format(new Date(assessment.schedule), "HH:mm")}
+
+              {assessment.schedule && (
+                <div className="flex gap-2">
+                  <div className="text-4xl font-bold text-primary">
+                    {format(new Date(assessment.schedule), "d MMM")}
+                  </div>
+                  <div className="text-4xl text-slate-500">
+                    / {format(new Date(assessment.schedule), "HH:mm")}
+                  </div>
+                </div>
+              )}
+
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-4">
+                  <AvatarGroup evaluations={assessment.evaluations} />
+                  <div className="text-sm">
+                    <p className="font-medium">{assessment.participant.name}</p>
+                    <p className="text-muted-foreground">
+                      {assessment.participant.jabatan}
+                    </p>
+                  </div>
+                </div>
+                <p className="text-sm text-muted-foreground">
+                  {assessment.metodePelaksanaan.toLowerCase() === "online"
+                    ? assessment.linkMeeting
+                    : assessment.ruangan}
+                </p>
               </div>
             </div>
+          </CardContent>
+        </Card>
+      </motion.div>
+    </Link>
+  );
+};
 
-            <div className="flex items-center justify-between">
-              <AvatarGroup evaluators={assessment.evaluators} />
-              <p className="text-sm text-muted-foreground">
-                {assessment.metodePelaksanaan === "online"
-                  ? assessment.linkOnline
-                  : assessment.ruangan}
-              </p>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-    </motion.div>
-  </Link>
-);
-
-export function ScheduleGrid({ search }) {
-  const filteredSchedule = mockSchedule.filter(
+export function ScheduleGrid({ assessments = [], search }) {
+  const filteredAssessments = assessments.filter(
     (assessment) =>
       search.toLowerCase() === "" ||
       assessment.judul.toLowerCase().includes(search.toLowerCase())
   );
 
-  const now = new Date();
-  const upcoming = filteredSchedule.filter(
-    (a) => new Date(a.schedule) > now && a.status !== "CANCELLED"
+  const upcoming = filteredAssessments.filter(
+    (assessment) => assessment.status === "CREATED"
   );
-  const pending = filteredSchedule.filter(
-    (a) => a.requirementStatus === "INCOMPLETE" && a.status !== "CANCELLED"
+
+  const past = filteredAssessments.filter(
+    (assessment) => assessment.status === "COMPLETED"
   );
-  const past = filteredSchedule.filter(
-    (a) => new Date(a.schedule) < now && a.status === "COMPLETED"
+
+  const cancelled = filteredAssessments.filter(
+    (assessment) => assessment.status === "CANCELLED"
   );
-  const cancelled = filteredSchedule.filter((a) => a.status === "CANCELLED");
 
   return (
     <Tabs defaultValue="upcoming" className="w-full">
-      <TabsList className="">
+      <TabsList>
         <TabsTrigger value="upcoming">Upcoming</TabsTrigger>
-        <TabsTrigger value="pending">Pending</TabsTrigger>
         <TabsTrigger value="past">Past</TabsTrigger>
         <TabsTrigger value="cancelled">Cancelled</TabsTrigger>
       </TabsList>
@@ -236,19 +181,6 @@ export function ScheduleGrid({ search }) {
           {upcoming.length === 0 && (
             <div className="col-span-full py-8 text-center text-muted-foreground">
               No upcoming assessments
-            </div>
-          )}
-        </div>
-      </TabsContent>
-
-      <TabsContent value="pending" className="mt-6">
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {pending.map((assessment) => (
-            <ScheduleCard key={assessment.id} assessment={assessment} />
-          ))}
-          {pending.length === 0 && (
-            <div className="col-span-full py-8 text-center text-muted-foreground">
-              No pending assessments
             </div>
           )}
         </div>

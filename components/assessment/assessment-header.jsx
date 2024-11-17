@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import { NewAssessmentForm } from "./new-assessment-form";
 import ModernAssessmentMeetingDialog from "./assessment-meeting-dialog";
 
-export function AssessmentHeader() {
+export function AssessmentHeader({ onAssessmentCreated }) {
   return (
     <>
       <div className="flex items-center justify-between">
@@ -19,7 +19,7 @@ export function AssessmentHeader() {
           initial={{ opacity: 0, x: 20 }}
           animate={{ opacity: 1, x: 0 }}
         >
-          <NewAssessmentForm />
+          <NewAssessmentForm onAssessmentCreated={onAssessmentCreated} />
           <ModernAssessmentMeetingDialog />
         </motion.div>
       </div>

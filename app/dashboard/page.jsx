@@ -28,6 +28,7 @@ import {
 } from "recharts";
 import { Checkbox } from "@/components/ui/checkbox";
 import Link from "next/link";
+import { useAuth } from "@/hooks/use-auth";
 
 const formasiData = [
   { name: "IP", value: 80, color: "#459ab0" },
@@ -35,6 +36,9 @@ const formasiData = [
 ];
 
 export default function DashboardPage() {
+  const { user, loading } = useAuth();
+  console.log(user);
+
   return (
     <div className="">
       {/* Dashboard Content */}
@@ -48,7 +52,7 @@ export default function DashboardPage() {
             <div className="col-span-4 flex items-start justify-between">
               <div className="space-y-1">
                 <h1 className="text-4xl font-medium tracking-tight">
-                  Welcome back, Sarah
+                  Welcome back, {user?.name}
                 </h1>
                 <p className="text-lg text-muted-foreground">
                   Here's an overview of your assessment activities

@@ -1,14 +1,32 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { useState } from "react";
 import { Loader2 } from "lucide-react";
-import { toast } from "sonner";
+import { useToast } from "@/hooks/use-toast"; // Updated import for toast
+import { API_ENDPOINTS } from "@/config/api"; // Importing API endpoints
+import { useAuth } from "@/hooks/use-auth"; // Importing useAuth to access session
 
-export function AddUserDialog({ open, onOpenChange }) {
+export function AddUserDialog({ open, onOpenChange, onUserAdded }) {
+  // Added onUserAdded prop
+  const { toast } = useToast();
+  const { session } = useAuth();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [newUser, setNewUser] = useState({
     name: "",
@@ -26,22 +44,51 @@ export function AddUserDialog({ open, onOpenChange }) {
     setIsSubmitting(true);
 
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      toast.success("User added successfully");
-      onOpenChange(false);
-      setNewUser({
-        name: "",
-        email: "",
-        phone: "",
-        password: "",
-        nip: "",
-        role: "",
-        jabatan: "",
-        bidang: "",
+      const response = await fetch(API_ENDPOINTS.USERS.LIST, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${session?.accessToken}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(newUser),
       });
+
+      const result = await response.json();
+
+      if (response.ok && result.success) {
+        toast({
+          variant: "default",
+          title: "Success",
+          description: "User added successfully",
+          duration: 3000,
+        });
+        onUserAdded(); // Call the callback to refresh the user list
+        onOpenChange(false);
+        setNewUser({
+          name: "",
+          email: "",
+          phone: "",
+          password: "",
+          nip: "",
+          role: "",
+          jabatan: "",
+          bidang: "",
+        });
+      } else {
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: result.message || "Failed to add user",
+          duration: 3000,
+        });
+      }
     } catch (error) {
-      toast.error("Failed to add user");
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to add user",
+        duration: 3000,
+      });
     } finally {
       setIsSubmitting(false);
     }
