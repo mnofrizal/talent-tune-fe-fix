@@ -12,18 +12,22 @@ export default function SchedulePage() {
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState("All");
   const [assessments, setAssessments] = useState([]);
-  console.log({ assessments });
+  console.log(assessments);
 
   const fetchAssessments = async () => {
     try {
-      const response = await fetch(API_ENDPOINTS.ASSESSMENTS.LIST, {
+      let url =
+        session?.user.systemRole === "ADMINISTRATOR"
+          ? API_ENDPOINTS.ASSESSMENTS.LIST
+          : API_ENDPOINTS.ASSESSMENTS.LIST_BY_USER(session.user.id);
+      const response = await fetch(url, {
         method: "GET",
         headers: {
           Authorization: `Bearer ${session?.accessToken}`, // Using session.accessToken
         },
       });
       if (!response.ok) {
-        throw new Error("Failed to fetch users");
+        throw new Error("Failed to fetch assessments");
       }
       const result = await response.json();
 

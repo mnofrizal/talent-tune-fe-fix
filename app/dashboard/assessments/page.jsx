@@ -8,8 +8,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import AssessmentStastics from "@/components/assessment/assesment-statistics";
 import { useAuth } from "@/hooks/use-auth";
 import { API_ENDPOINTS } from "@/config/api";
+import { useToast } from "@/hooks/use-toast";
 
 export default function AssessmentPage() {
+  const { toast } = useToast();
   const { session } = useAuth(); // Accessing session from useAuth
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState("All");
@@ -37,6 +39,62 @@ export default function AssessmentPage() {
       }
     } catch (error) {
       console.error(error);
+    }
+  };
+
+  const handleSendInvitation = async (assessmentId) => {
+    try {
+      const response = await fetch(
+        API_ENDPOINTS.ASSESSMENTS.SEND_INVITATIONMAIL(assessmentId),
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${session?.accessToken}`,
+          },
+        }
+      );
+      if (!response.ok) {
+        throw new Error("Failed to send invitation");
+      }
+      toast({
+        title: "Success",
+        description: `Invitation sent successfully!`,
+      });
+      fetchAssessments();
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: `Error sending invitation for assessment ID: ${assessmentId}, error: ${error}`,
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleDelete = async (assessmentId) => {
+    try {
+      const response = await fetch(
+        API_ENDPOINTS.ASSESSMENTS.DETAIL(assessmentId),
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${session?.accessToken}`,
+          },
+        }
+      );
+      if (!response.ok) {
+        throw new Error("Failed to delete assessment");
+      }
+      toast({
+        title: "Success",
+        description: `Assessment ID: ${assessmentId} deleted successfully!`,
+      });
+      fetchAssessments();
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: `Error deleting assessment ID: ${assessmentId}, error: ${error}`,
+        variant: "destructive",
+      });
     }
   };
 
@@ -71,6 +129,8 @@ export default function AssessmentPage() {
             status={status}
             currentPage={currentPage}
             setCurrentPage={setCurrentPage}
+            onSendInvitation={handleSendInvitation}
+            onDelete={handleDelete}
           />
         </CardContent>
       </Card>

@@ -74,7 +74,7 @@ export function QuestionnaireDialog({ open, onOpenChange, onComplete }) {
             })}
 
             <div className="space-y-6">
-              <div className="flex items-start space-x-3 rounded-lg bg-muted/50 p-4">
+              <div className="flex items-start space-x-3 rounded-lg bg-yellow-100 p-4">
                 <Checkbox
                   id="agreement"
                   checked={agreed}

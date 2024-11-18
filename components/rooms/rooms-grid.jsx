@@ -22,19 +22,6 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Separator } from "../ui/separator";
 
-// Status grouping configuration
-const STATUS_GROUPS = {
-  scheduled: ["CREATED", "SCHEDULED", "RESCHEDULE"],
-  ongoing: [
-    "WAITING_CONFIRMATION",
-    "TALENT_REQUIREMENTS",
-    "READY_FOR_ASSESSMENT",
-    "EVALUATING",
-    "NEED_REVIEW",
-  ],
-  complete: ["DONE", "CANCELED"],
-};
-
 const StatusBadge = ({ status }) => {
   const statusStyles = {
     CREATED: "bg-yellow-100 text-yellow-800",
@@ -42,11 +29,23 @@ const StatusBadge = ({ status }) => {
     RESCHEDULE: "bg-yellow-100 text-yellow-800",
     WAITING_CONFIRMATION: "bg-blue-100 text-blue-800",
     TALENT_REQUIREMENTS: "bg-blue-100 text-blue-800",
-    READY_FOR_ASSESSMENT: "bg-blue-100 text-blue-800",
+    READY_FOR_ASSESSMENT: "bg-green-100 text-green-800",
     EVALUATING: "bg-blue-100 text-blue-800",
     NEED_REVIEW: "bg-blue-100 text-blue-800",
     DONE: "bg-green-100 text-green-800",
     CANCELED: "bg-red-100 text-red-800",
+  };
+
+  const statusText = {
+    SCHEDULED: "Scheduled",
+    WAITING_CONFIRMATION: "Waiting Confirmation",
+    TALENT_REQUIREMENTS: "Talent Requirements",
+    READY_FOR_ASSESSMENT: "Ready",
+    EVALUATING: "in Progress",
+    NEED_REVIEW: "Needs Review",
+    DONE: "Done",
+    CANCELED: "Canceled",
+    RESCHEDULE: "Rescheduled",
   };
 
   return (
@@ -55,9 +54,16 @@ const StatusBadge = ({ status }) => {
         statusStyles[status] || "bg-gray-100 text-gray-800"
       }`}
     >
-      {status.replace(/_/g, " ")}
+      {statusText[status] ? statusText[status].toUpperCase() : ""}
     </span>
   );
+};
+
+// Status grouping configuration
+const STATUS_GROUPS = {
+  scheduled: ["READY_FOR_ASSESSMENT"],
+  ongoing: ["EVALUATING", "NEED_REVIEW"],
+  complete: ["DONE", "CANCELED"],
 };
 
 const AvatarGroup = ({ evaluators }) => {
@@ -127,11 +133,11 @@ export function RoomsGrid({ search, status, onStartRoom, assessments }) {
   };
 
   const handleRoomAction = (room) => {
-    const scheduledStatuses = ["CREATED", "SCHEDULED", "RESCHEDULE"];
+    const scheduledStatuses = ["READY_FOR_ASSESSMENT"];
     if (scheduledStatuses.includes(room.status)) {
       onStartRoom(room);
     } else {
-      router.push(`/dashboard/rooms/${room.id}`);
+      router.push(`/dashboard/rooms/`);
     }
   };
 
@@ -143,7 +149,7 @@ export function RoomsGrid({ search, status, onStartRoom, assessments }) {
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      whileHover={{ scale: 1.05 }}
+      whileHover={{ scale: 1.02 }}
       transition={{ duration: 0.2, delay: index * 0.1 }}
     >
       <Card className="rounded-3xl transition-shadow hover:shadow-lg">

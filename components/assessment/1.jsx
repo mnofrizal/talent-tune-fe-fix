@@ -1,54 +1,50 @@
 "use client";
 
-import { useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import { Card, CardContent } from "@/components/ui/card";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 import {
-  ChevronDown,
   Plus,
-  Calendar,
-  X,
   CheckCircle2,
   Circle,
   Download,
-  MoreHorizontal,
   Trash2,
-  FileSpreadsheet,
   File,
 } from "lucide-react";
-import { Separator } from "../ui/separator";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
-import { Alert } from "../ui/alert";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Alert } from "@/components/ui/alert";
 
-export default function ModernAssessmentMeetingDialog() {
-  const [open, setOpen] = useState(false);
+export default function AssessmentDetailsDialog({
+  open,
+  onOpenChange,
+  assessment,
+}) {
+  if (!assessment) return null;
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button variant="outline">Open Card ID</Button>
-      </DialogTrigger>
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="p-0 sm:max-w-[800px]">
         <Card className="w-full border-0 shadow-none">
           <CardContent className="space-y-4 p-6">
             <div className="flex items-center justify-between">
-              <h1 className="text-xl font-semibold">
-                Making a NFT Landing Page
-              </h1>
+              <h1 className="text-xl font-semibold">{assessment.judul}</h1>
               <div className="flex items-center space-x-2">
                 <Alert
-                  variant="destructive"
+                  variant={
+                    assessment.attendanceConfirmation
+                      ? "success"
+                      : "destructive"
+                  }
                   className="p-2 text-center text-sm"
                 >
-                  Talent Tidak Hadir
+                  {assessment.attendanceConfirmation ? "HADIR" : "TIDAK HADIR"}
                 </Alert>
                 <Button
                   variant="outline"
                   className="border-0 bg-green-50 text-green-600 hover:bg-green-50 hover:text-green-600"
                 >
-                  In Progress
+                  {assessment.status}
                 </Button>
               </div>
             </div>
@@ -60,20 +56,25 @@ export default function ModernAssessmentMeetingDialog() {
                     <div className="text-xs text-gray-500">ASSIGNED TO</div>
                     <div className="flex items-center gap-2">
                       <Avatar className="h-6 w-6">
-                        <AvatarImage src="/placeholder.svg" />
-                        <AvatarFallback>RF</AvatarFallback>
+                        <AvatarFallback>
+                          {assessment.participant?.name?.charAt(0)}
+                        </AvatarFallback>
                       </Avatar>
-                      <span className="text-sm">Muhammad Naufal Amrizal</span>
+                      <span className="text-sm">
+                        {assessment.participant?.name}
+                      </span>
                     </div>
                   </div>
                   <div className="space-y-2">
                     <div className="text-xs text-gray-500">JABATAN</div>
-                    <div className="text-sm">OFFICER FASILITAS DAN SARANA</div>
+                    <div className="text-sm">
+                      {assessment.participant?.jabatan}
+                    </div>
                   </div>
                   <div className="space-y-2">
                     <div className="text-xs text-gray-500">GRADE</div>
                     <div className="flex items-center gap-2 text-sm">
-                      GENERALIS 2 / 11
+                      {assessment.participant?.grade || "N/A"}
                     </div>
                   </div>
                 </div>
@@ -110,14 +111,14 @@ export default function ModernAssessmentMeetingDialog() {
                       <div className="space-y-4">
                         <div className="flex items-center justify-between">
                           <h1 className="text-xl font-bold">
-                            Generalis 2 Bidang Operasi
+                            {assessment.proyeksi}
                           </h1>
                         </div>
                         <div className="grid grid-cols-2 gap-4">
                           <div className="space-y-1">
                             <div className="text-sm text-gray-500">Judul</div>
                             <div className="text-sm font-medium">
-                              Generalis 2 Bidang Operasi
+                              {assessment.judul}
                             </div>
                           </div>
                           <div className="space-y-1">
@@ -125,20 +126,43 @@ export default function ModernAssessmentMeetingDialog() {
                               Schedule
                             </div>
                             <div className="text-sm font-medium">
-                              14 Jan 2023, 15:43:23
+                              {new Date(assessment.schedule).toLocaleString()}
                             </div>
                           </div>
                           <div className="space-y-1">
-                            <div className="text-sm text-gray-500">Materi</div>
+                            <div className="text-sm text-gray-500">Metode</div>
                             <div className="text-sm font-medium">
-                              Peran bidang untuk mencapai kinerja unti yang baik
+                              {assessment.metodePelaksanaan}
                             </div>
                           </div>
 
                           <div className="space-y-1">
                             <div className="text-sm text-gray-500">Lokasi</div>
                             <div className="text-sm font-medium">
-                              Offline - Ruang IHT
+                              {assessment.metodePelaksanaan === "online" ? (
+                                <a
+                                  href={assessment.linkMeeting}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="text-blue-500 hover:text-blue-700"
+                                >
+                                  {assessment.linkMeeting}
+                                </a>
+                              ) : assessment.metodePelaksanaan === "offline" ? (
+                                <div>{assessment.ruangan}</div>
+                              ) : (
+                                <>
+                                  <div>{assessment.ruangan}</div>
+                                  <a
+                                    href={assessment.linkMeeting}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="text-blue-500 hover:text-blue-700"
+                                  >
+                                    {assessment.linkMeeting}
+                                  </a>
+                                </>
+                              )}
                             </div>
                           </div>
                         </div>
@@ -148,66 +172,37 @@ export default function ModernAssessmentMeetingDialog() {
                   <TabsContent value="evaluators" className="pt-4">
                     <div className="space-y-4">
                       <div className="space-y-3">
-                        <Card className="w-full transition-colors hover:bg-gray-50">
-                          <CardContent className="p-4">
-                            <div className="flex items-center">
-                              <Avatar className="h-12 w-12">
-                                <AvatarImage src="" alt="Evaluator 1" />
-                                <AvatarFallback>E1</AvatarFallback>
-                              </Avatar>
-                              <div className="ml-4">
-                                <div className="text-sm font-medium">
-                                  Evaluator Name 1
-                                </div>
-                                <div className="text-xs text-gray-500">
-                                  Jabatan 1
-                                </div>
-                              </div>
-                            </div>
-                          </CardContent>
-                        </Card>
-                        <Card className="w-full transition-colors hover:bg-gray-50">
-                          <CardContent className="p-4">
-                            <div className="flex items-center">
-                              <Avatar className="h-12 w-12">
-                                <AvatarImage src="" alt="Evaluator 2" />
-                                <AvatarFallback>E2</AvatarFallback>
-                              </Avatar>
-                              <div className="ml-4">
-                                <div className="text-sm font-medium">
-                                  Evaluator Name 2
-                                </div>
-                                <div className="text-xs text-gray-500">
-                                  Jabatan 2
+                        {assessment.evaluations?.map((evaluation, index) => (
+                          <Card
+                            key={evaluation.evaluatorId}
+                            className="w-full transition-colors hover:bg-gray-50"
+                          >
+                            <CardContent className="p-4">
+                              <div className="flex items-center">
+                                <Avatar className="h-12 w-12">
+                                  <AvatarFallback>
+                                    {evaluation.evaluator?.name
+                                      .split(" ")
+                                      .map((n) => n[0])
+                                      .join("")}
+                                  </AvatarFallback>
+                                </Avatar>
+                                <div className="ml-4">
+                                  <div className="text-sm font-medium">
+                                    {evaluation.evaluator?.name}
+                                  </div>
+                                  <div className="text-xs text-gray-500">
+                                    {evaluation.evaluator?.jabatan}
+                                  </div>
                                 </div>
                               </div>
-                            </div>
-                          </CardContent>
-                        </Card>
-                        <Card className="w-full transition-colors hover:bg-gray-50">
-                          <CardContent className="p-4">
-                            <div className="flex items-center">
-                              <Avatar className="h-12 w-12">
-                                <AvatarImage src="" alt="Evaluator 3" />
-                                <AvatarFallback>E3</AvatarFallback>
-                              </Avatar>
-                              <div className="ml-4">
-                                <div className="text-sm font-medium">
-                                  Evaluator Name 3
-                                </div>
-                                <div className="text-xs text-gray-500">
-                                  Jabatan 3
-                                </div>
-                              </div>
-                            </div>
-                          </CardContent>
-                        </Card>
+                            </CardContent>
+                          </Card>
+                        ))}
                       </div>
                     </div>
                   </TabsContent>
-                  <TabsContent value="penilaian">
-                    Courier information content
-                  </TabsContent>
+                  <TabsContent value="penilaian">Penilaian content</TabsContent>
                   <TabsContent value="documents" className="pt-2">
                     <div className="space-y-6">
                       <Card className="w-full">
@@ -216,30 +211,9 @@ export default function ModernAssessmentMeetingDialog() {
                             <File className="h-5 w-5 text-orange-600" />
                             <div className="flex flex-col">
                               <span className="text-sm font-medium">
-                                peran-msdm.pptx
-                              </span>
-                              <span className="text-xs text-gray-500">
-                                14 MB
+                                No documents available
                               </span>
                             </div>
-                          </div>
-                          <div className="flex items-center gap-1">
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="h-8 w-8 text-gray-500 hover:text-gray-900"
-                            >
-                              <Download className="h-4 w-4" />
-                              <span className="sr-only">Download</span>
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="h-8 w-8 text-gray-500 hover:text-gray-900"
-                            >
-                              <Trash2 className="h-4 w-4" />
-                              <span className="sr-only">Delete</span>
-                            </Button>
                           </div>
                         </CardContent>
                       </Card>
@@ -255,7 +229,7 @@ export default function ModernAssessmentMeetingDialog() {
                       <CheckCircle2 className="h-5 w-5 text-blue-600" />
                       <div className="space-y-1">
                         <div className="text-sm font-medium">
-                          Assesment dibuat
+                          Assessment Created
                         </div>
                       </div>
                     </div>

@@ -10,6 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { BookOpen, Calendar, Clock, MapPin } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
+import StatusBadge from "../status-badge";
 
 export function AssessmentInfo({ assessment }) {
   if (!assessment) {
@@ -49,8 +50,10 @@ export function AssessmentInfo({ assessment }) {
               </div>
             </div>
             <div className="flex items-center gap-2">
-              <div className="text-sm text-muted-foreground">Status</div>
-              <Badge variant="outline">{assessment?.status}</Badge>
+              <StatusBadge
+                status={assessment?.status}
+                className={"rounded-md p-2"}
+              />
             </div>
           </div>
         </div>
@@ -62,12 +65,6 @@ export function AssessmentInfo({ assessment }) {
             <CardTitle className="text-xl font-semibold">
               {assessment?.judul}
             </CardTitle>
-            <Badge
-              variant={assessment?.status === "CREATED" ? "default" : "outline"}
-              className="text-sm font-medium"
-            >
-              {assessment?.status}
-            </Badge>
           </div>
           <CardDescription className="text-base">
             Information about your upcoming assessment

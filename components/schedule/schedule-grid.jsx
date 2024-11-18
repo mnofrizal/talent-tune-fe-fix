@@ -82,7 +82,7 @@ const ScheduleCard = ({ assessment }) => {
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         whileTap={{ scale: 0.9 }}
-        whileHover={{ scale: 1.05 }}
+        whileHover={{ scale: 1.03 }}
         transition={{ duration: 0.2, ease: "easeInOut" }}
         className="cursor-pointer"
       >
@@ -153,16 +153,24 @@ export function ScheduleGrid({ assessments = [], search }) {
       assessment.judul.toLowerCase().includes(search.toLowerCase())
   );
 
-  const upcoming = filteredAssessments.filter(
-    (assessment) => assessment.status === "CREATED"
+  const upcoming = filteredAssessments.filter((assessment) =>
+    [
+      "SCHEDULED",
+      "WAITING_CONFIRMATION",
+      "TALENT_REQUIREMENTS",
+      "READY_FOR_ASSESSMENT",
+      "EVALUATING",
+      "NEED_REVIEW",
+      "RESCHEDULE",
+    ].includes(assessment.status)
   );
 
   const past = filteredAssessments.filter(
-    (assessment) => assessment.status === "COMPLETED"
+    (assessment) => assessment.status === "DONE"
   );
 
   const cancelled = filteredAssessments.filter(
-    (assessment) => assessment.status === "CANCELLED"
+    (assessment) => assessment.status === "CANCELED"
   );
 
   return (

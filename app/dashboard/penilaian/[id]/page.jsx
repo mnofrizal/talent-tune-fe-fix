@@ -17,15 +17,24 @@ import { Progress } from "@/components/ui/progress";
 const questions = [
   {
     id: "q-1",
-    title: "Referensi",
-    description:
-      "Pemahaman Keputusan Direksi No. 204.K/010/IP/2019 tentang Kebijakan mengenai Anti Penyuapan di PT Indonesia Power.",
+    title: "Pemahaman Unit",
+    description: "Pemahaman tentang struktur dan fungsi unit kerja perusahaan.",
   },
   {
     id: "q-2",
     title: "Pemahaman Bidang Kerja",
     description:
       "Pemahaman peserta terhadap bidang kerja dan tanggung jawabnya",
+  },
+  {
+    id: "q-3",
+    title: "Sikap/Attitude",
+    description: "Evaluasi sikap dan attitude peserta dalam bekerja.",
+  },
+  {
+    id: "q-4",
+    title: "Keterampilan Komunikasi",
+    description: "Evaluasi keterampilan komunikasi peserta dalam berinteraksi.",
   },
   {
     id: "conclusion",

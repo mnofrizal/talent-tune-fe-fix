@@ -2,7 +2,6 @@
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { NewAssessmentForm } from "./new-assessment-form";
-import ModernAssessmentMeetingDialog from "./assessment-meeting-dialog";
 
 export function AssessmentHeader({ onAssessmentCreated }) {
   return (
@@ -20,7 +19,6 @@ export function AssessmentHeader({ onAssessmentCreated }) {
           animate={{ opacity: 1, x: 0 }}
         >
           <NewAssessmentForm onAssessmentCreated={onAssessmentCreated} />
-          <ModernAssessmentMeetingDialog />
         </motion.div>
       </div>
     </>

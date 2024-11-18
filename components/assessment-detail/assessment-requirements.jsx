@@ -29,7 +29,7 @@ export function AssessmentRequirements({ assessment }) {
   const updateAssessment = async (data) => {
     try {
       const response = await fetch(
-        API_ENDPOINTS.ASSESSMENTS.DETAIL(assessment.id),
+        API_ENDPOINTS.ASSESSMENTS.REQUIREMENT_SUBMIT(assessment.id),
         {
           method: "PUT",
           headers: {

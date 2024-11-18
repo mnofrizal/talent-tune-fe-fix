@@ -438,14 +438,13 @@ export default function DashboardPage() {
                   </div>
 
                   <div className="mt-4 flex justify-center">
-                    <Button
-                      size="lg"
-                      variant="outline"
-                      className="w-full rounded-full"
+                    <Link
+                      href="/dashboard/rooms"
+                      className="flex w-full items-center justify-center rounded-full border border-primary py-2 text-primary hover:bg-primary/5 hover:text-primary"
                     >
                       <ArrowRight className="mr-2 h-4 w-4" />
                       Go to Room
-                    </Button>
+                    </Link>
                   </div>
                 </Card>
               </div>

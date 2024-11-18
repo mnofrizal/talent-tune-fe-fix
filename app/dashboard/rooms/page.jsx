@@ -27,7 +27,11 @@ export default function RoomsPage() {
 
   const fetchAssessments = async () => {
     try {
-      const response = await fetch(API_ENDPOINTS.ASSESSMENTS.LIST, {
+      let url =
+        session?.user.systemRole === "ADMINISTRATOR"
+          ? API_ENDPOINTS.ASSESSMENTS.LIST
+          : API_ENDPOINTS.ASSESSMENTS.LIST_BY_USER(session.user.id);
+      const response = await fetch(url, {
         method: "GET",
         headers: {
           Authorization: `Bearer ${session?.accessToken}`, // Using session.accessToken
@@ -60,10 +64,34 @@ export default function RoomsPage() {
     setStartDialogOpen(true);
   };
 
-  const handleConfirmStart = () => {
-    // Handle room start logic here
-    setStartDialogOpen(false);
-    setSelectedRoom(null);
+  const handleConfirmStart = async () => {
+    try {
+      const response = await fetch(
+        API_ENDPOINTS.ASSESSMENTS.START_ASSESSMENT(selectedRoom.id),
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${session?.accessToken}`,
+          },
+          body: JSON.stringify({ roomId: selectedRoom.id }),
+        }
+      );
+      if (!response.ok) {
+        throw new Error("Failed to start room");
+      }
+      const result = await response.json();
+      if (result.success) {
+        console.log("Room started successfully");
+        setStartDialogOpen(false);
+        setSelectedRoom(null);
+        fetchAssessments();
+      } else {
+        console.error(result.message);
+      }
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   return (

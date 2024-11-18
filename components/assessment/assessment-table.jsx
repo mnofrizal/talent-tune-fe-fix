@@ -1,4 +1,5 @@
 "use client";
+import { useState } from "react";
 import {
   Table,
   TableBody,
@@ -16,34 +17,12 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Download, Eye, MapPin, Send, Video, Wifi } from "lucide-react";
+import { Download, Eye, MapPin, Send, Trash, Video, Wifi } from "lucide-react";
 import { motion } from "framer-motion";
 import { Badge } from "@/components/ui/badge";
-
-const StatusBadge = ({ status }) => {
-  const statusStyles = {
-    CREATED: "bg-orange-100 text-orange-800",
-    SCHEDULED: "bg-indigo-100 text-indigo-800",
-    WAITING_CONFIRMATION: "bg-purple-100 text-purple-800",
-    TALENT_REQUIREMENTS: "bg-cyan-100 text-cyan-800",
-    READY_FOR_ASSESSMENT: "bg-emerald-100 text-emerald-800",
-    EVALUATING: "bg-blue-100 text-blue-800",
-    NEED_REVIEW: "bg-yellow-100 text-yellow-800",
-    DONE: "bg-green-100 text-green-800",
-    CANCELED: "bg-red-100 text-red-800",
-    RESCHEDULE: "bg-gray-100 text-gray-800",
-  };
-
-  return (
-    <span
-      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-        statusStyles[status] || "bg-gray-100 text-gray-800"
-      }`}
-    >
-      {status}
-    </span>
-  );
-};
+import AssessmentDetailsDialog from "./assessment-details-dialog";
+import StatusBadge from "../status-badge";
+import { useAuth } from "@/hooks/use-auth";
 
 export function AssessmentTable({
   assessments,
@@ -51,7 +30,12 @@ export function AssessmentTable({
   status,
   currentPage,
   setCurrentPage,
+  onSendInvitation,
+  onDelete,
 }) {
+  const { user } = useAuth();
+  const [selectedAssessment, setSelectedAssessment] = useState(null);
+
   const filteredAssessments = assessments.filter((assessment) => {
     const matchesSearch =
       search.toLowerCase() === "" ||
@@ -100,7 +84,10 @@ export function AssessmentTable({
                   <TableCell>
                     #{String(assessment.id).padStart(4, "0")}
                   </TableCell>
-                  <TableCell>
+                  <TableCell
+                    onClick={() => setSelectedAssessment(assessment)}
+                    className="cursor-pointer hover:underline"
+                  >
                     <div className="">
                       <div className="font-medium text-slate-800">
                         {assessment.judul}
@@ -189,14 +176,29 @@ export function AssessmentTable({
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
                         <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                        <DropdownMenuItem>
+                        <DropdownMenuItem
+                          className="cursor-pointer"
+                          onClick={() => onSendInvitation(assessment.id)}
+                        >
                           <Send className="mr-2 h-4 w-4" />
                           <span>Send Invitation</span>
                         </DropdownMenuItem>
-                        <DropdownMenuItem>
+                        <DropdownMenuItem
+                          className="cursor-pointer"
+                          onClick={() => setSelectedAssessment(assessment)}
+                        >
                           <Eye className="mr-2 h-4 w-4" />
                           <span>View Details</span>
                         </DropdownMenuItem>
+                        {user?.systemRole === "ADMINISTRATOR" && (
+                          <DropdownMenuItem
+                            className="cursor-pointer text-red-600"
+                            onClick={() => onDelete(assessment.id)}
+                          >
+                            <Trash className="mr-2 h-4 w-4" />
+                            <span>Delete</span>
+                          </DropdownMenuItem>
+                        )}
                         {assessment.metodePelaksanaan === "ONLINE" &&
                           assessment.status !== "DONE" &&
                           assessment.status !== "CANCELED" && (
@@ -220,6 +222,14 @@ export function AssessmentTable({
           </TableBody>
         </Table>
       </motion.div>
+
+      {selectedAssessment && (
+        <AssessmentDetailsDialog
+          open={!!selectedAssessment}
+          onOpenChange={() => setSelectedAssessment(null)}
+          assessment={selectedAssessment}
+        />
+      )}
 
       <div className="flex items-center justify-end space-x-2 py-4">
         <Button

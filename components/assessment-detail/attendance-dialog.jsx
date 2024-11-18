@@ -93,13 +93,13 @@ export function AttendanceDialog({ open, onOpenChange, onSubmit, assessment }) {
               <Label className="cursor-pointer [&:has([data-state=checked])]:opacity-100">
                 <RadioGroupItem value="Hadir" className="sr-only" />
                 <Card
-                  className={`relative p-4 transition-all hover:bg-muted/50 ${
+                  className={`shadow-none relative p-4 transition-all hover:bg-muted/50 ${
                     attendance === "Hadir"
                       ? "border-primary bg-primary/10"
                       : "opacity-75"
                   }`}
                 >
-                  <CardTitle className="flex items-center gap-2">
+                  <CardTitle className="flex items-center justify-between gap-2">
                     Hadir
                     {attendance === "Hadir" && (
                       <Check className="h-4 w-4 text-primary" />
@@ -111,13 +111,13 @@ export function AttendanceDialog({ open, onOpenChange, onSubmit, assessment }) {
               <Label className="cursor-pointer [&:has([data-state=checked])]:opacity-100">
                 <RadioGroupItem value="Tidak Hadir" className="sr-only" />
                 <Card
-                  className={`relative p-4 transition-all hover:bg-muted/50 ${
+                  className={`shadow-none relative p-4 transition-all hover:bg-muted/50 ${
                     attendance === "Tidak Hadir"
                       ? "border-destructive bg-destructive/10"
                       : "opacity-75"
                   }`}
                 >
-                  <CardTitle className="flex items-center gap-2">
+                  <CardTitle className="flex items-center justify-between gap-2 shadow-none">
                     Tidak Hadir
                     {attendance === "Tidak Hadir" && (
                       <Check className="h-4 w-4 text-destructive" />

@@ -38,12 +38,14 @@ const Logo = () => (
   </div>
 );
 
-const adminMenuItems = [
+const generalMenuItems = [
   {
     title: "Dashboard",
     href: "/dashboard",
     icon: LayoutDashboard,
   },
+];
+const adminMenuItems = [
   {
     title: "Users",
     href: "/dashboard/users",
@@ -153,11 +155,20 @@ const SidebarContent = ({ pathname, onMenuClick, menuItemCounts, user }) => (
     <div className="flex-1 space-y-6 py-2">
       <MenuSection
         title=""
-        items={adminMenuItems}
+        items={generalMenuItems}
         pathname={pathname}
         onMenuClick={onMenuClick}
         menuItemCounts={menuItemCounts}
       />
+      {user?.systemRole === "ADMINISTRATOR" && (
+        <MenuSection
+          title="Admin"
+          items={adminMenuItems}
+          pathname={pathname}
+          onMenuClick={onMenuClick}
+          menuItemCounts={menuItemCounts}
+        />
+      )}
       <MenuSection
         title="User"
         items={userMenuItems}
