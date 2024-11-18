@@ -71,7 +71,7 @@ export default function DashboardPage() {
 
           <Card className="w-full rounded-2xl border-gray-100 shadow-sm">
             <CardContent className="flex space-x-6 pt-6">
-              <Card className="rounded-2xl shadow-none dark:border-gray-800">
+              <Card className="rounded-2xl shadow-none">
                 <CardContent className="p-6">
                   <div className="space-y-2">
                     <div className="flex items-center justify-between">
@@ -89,7 +89,7 @@ export default function DashboardPage() {
                   </div>
                 </CardContent>
               </Card>
-              <Card className="rounded-2xl shadow-none dark:border-gray-800">
+              <Card className="rounded-2xl shadow-none">
                 <CardContent className="p-6">
                   <div className="space-y-2">
                     <div className="flex items-center justify-between">
@@ -107,7 +107,7 @@ export default function DashboardPage() {
                   </div>
                 </CardContent>
               </Card>
-              <Card className="rounded-2xl shadow-none dark:border-gray-800">
+              <Card className="rounded-2xl shadow-none">
                 <CardContent className="p-6">
                   <div className="space-y-2">
                     <div className="flex items-center justify-between">
@@ -125,7 +125,7 @@ export default function DashboardPage() {
                   </div>
                 </CardContent>
               </Card>
-              <Card className="rounded-2xl shadow-none dark:border-gray-800">
+              <Card className="rounded-2xl shadow-none">
                 <CardContent className="p-6">
                   <div className="space-y-2">
                     <div className="flex items-center justify-between">
@@ -384,7 +384,7 @@ export default function DashboardPage() {
                 <h3 className="mb-4 text-lg font-semibold">
                   Upcoming Assessments
                 </h3>
-                <Card className="rounded-2xl border-gray-100 bg-gray-50 p-3 py-4 shadow-sm dark:border-gray-800">
+                <Card className="rounded-2xl border-gray-100 bg-gray-50 p-3 py-4 shadow-sm">
                   <div className="space-y-4">
                     {[
                       {

@@ -43,7 +43,7 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" suppressHydrationWarning className="light">
       <body className={`${inter.className} antialiased`}>
         <Providers>{children}</Providers>
         <Toaster />

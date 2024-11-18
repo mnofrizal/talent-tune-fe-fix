@@ -35,7 +35,7 @@ const AssessmentStatistics = ({ assessments }) => {
   const stats = calculateStatistics();
 
   return (
-    <Card className="rounded-2xl border-gray-100 shadow-sm dark:border-gray-800">
+    <Card className="rounded-2xl border-gray-100 shadow-sm">
       <CardContent className="px-6 py-4">
         <div className="flex items-center justify-between gap-4">
           {/* Total Assessments */}

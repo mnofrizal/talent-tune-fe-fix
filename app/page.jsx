@@ -78,7 +78,7 @@ export default function TalentTuneLanding() {
                     dengan TalentTune
                   </div>
                 </div>
-                <p className="mx-auto max-w-[700px] text-gray-500 dark:text-gray-400 md:text-lg">
+                <p className="mx-auto max-w-[700px] text-gray-500 md:text-lg">
                   Tingkatkan kualitas pengelolaan karir pegawai dengan aplikasi
                   inovatif kami.
                 </p>
@@ -98,10 +98,7 @@ export default function TalentTuneLanding() {
             </div>
           </motion.div>
         </section>
-        <section
-          id="features"
-          className="bg-[#f4f6fa] py-12 dark:bg-gray-800 md:py-24 lg:py-32"
-        >
+        <section id="features" className="bg-[#f4f6fa] py-12 md:py-24 lg:py-32">
           <div className="container mx-auto px-4">
             <motion.h2
               className="mb-12 text-center text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl"
@@ -235,7 +232,7 @@ export default function TalentTuneLanding() {
             </motion.div>
           </div>
         </section>
-        <section className="bg-gray-100 py-12 dark:bg-gray-800 md:py-24 lg:py-32">
+        <section className="bg-gray-100 py-12 md:py-24 lg:py-32">
           <motion.div
             className="container mx-auto px-4"
             initial="initial"
@@ -248,7 +245,7 @@ export default function TalentTuneLanding() {
                 <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">
                   Siap Meningkatkan Kualitas Pengelolaan Karir?
                 </h2>
-                <p className="mx-auto max-w-[700px] text-gray-500 dark:text-gray-400 md:text-xl">
+                <p className="mx-auto max-w-[700px] text-gray-500 md:text-xl">
                   Mulai optimalisasi fit and proper test dan manajemen talenta
                   Anda sekarang.
                 </p>
@@ -268,7 +265,7 @@ export default function TalentTuneLanding() {
       </main>
       <footer className="border-t">
         <div className="container mx-auto flex flex-col items-center justify-between px-4 py-6 sm:flex-row">
-          <p className="text-xs text-gray-500 dark:text-gray-400">
+          <p className="text-xs text-gray-500">
             © 2024 TalentTune. Hak Cipta Dilindungi.
           </p>
           <nav className="mt-4 flex gap-4 sm:mt-0 sm:gap-6">
