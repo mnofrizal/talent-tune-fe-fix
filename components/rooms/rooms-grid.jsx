@@ -22,91 +22,31 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Separator } from "../ui/separator";
 
-// Mock data based on the provided schema
-const mockRooms = [
-  {
-    id: "1",
-    judul: "Generalis 2 Bidang Pemeliharaan",
-    materi: "Leadership Skills Evaluation",
-    metodePelaksanaan: "online",
-    linkOnline: "https://meet.google.com/abc-defg-hij",
-    evaluators: [
-      {
-        id: 1,
-        name: "Dr. John Smith",
-        jabatan: "Senior Evaluator",
-        avatar: "",
-      },
-      {
-        id: 2,
-        name: "Dr. Sarah Johnson",
-        jabatan: "Lead Assessor",
-        avatar: "",
-      },
-      {
-        id: 3,
-        name: "Dr. Michael Brown",
-        jabatan: "Technical Evaluator",
-        avatar: "",
-      },
-    ],
-    participants: [
-      {
-        id: 1,
-        name: "Alice Cooper",
-        nip: "123456",
-        jabatan: "Officer Perencaan Unit Kerja",
-        schedule: "2024-03-25T10:00:00Z",
-        status: "SCHEDULED",
-      },
-    ],
-  },
-  {
-    id: "2",
-    judul: "Generalis 2 Bidang Pemeliharaan",
-    materi: "Leadership Skills Evaluation",
-    metodePelaksanaan: "online",
-    linkOnline: "https://meet.google.com/abc-defg-hij",
-    evaluators: [
-      {
-        id: 1,
-        name: "Dr. John Smith",
-        jabatan: "Senior Evaluator",
-        avatar: "",
-      },
-      {
-        id: 2,
-        name: "Dr. Sarah Johnson",
-        jabatan: "Lead Assessor",
-        avatar: "",
-      },
-      {
-        id: 3,
-        name: "Dr. Michael Brown",
-        jabatan: "Technical Evaluator",
-        avatar: "",
-      },
-    ],
-    participants: [
-      {
-        id: 1,
-        name: "Alice Cooper",
-        nip: "123456",
-        jabatan: "Officer Perencaan Unit Kerja",
-        schedule: "2024-03-25T10:00:00Z",
-        status: "IN_PROGRESS",
-      },
-    ],
-  },
-  // ... rest of the mock data remains the same
-];
+// Status grouping configuration
+const STATUS_GROUPS = {
+  scheduled: ["CREATED", "SCHEDULED", "RESCHEDULE"],
+  ongoing: [
+    "WAITING_CONFIRMATION",
+    "TALENT_REQUIREMENTS",
+    "READY_FOR_ASSESSMENT",
+    "EVALUATING",
+    "NEED_REVIEW",
+  ],
+  complete: ["DONE", "CANCELED"],
+};
 
 const StatusBadge = ({ status }) => {
   const statusStyles = {
+    CREATED: "bg-yellow-100 text-yellow-800",
     SCHEDULED: "bg-yellow-100 text-yellow-800",
-    IN_PROGRESS: "bg-blue-100 text-blue-800",
-    COMPLETED: "bg-green-100 text-green-800",
-    CANCELLED: "bg-red-100 text-red-800",
+    RESCHEDULE: "bg-yellow-100 text-yellow-800",
+    WAITING_CONFIRMATION: "bg-blue-100 text-blue-800",
+    TALENT_REQUIREMENTS: "bg-blue-100 text-blue-800",
+    READY_FOR_ASSESSMENT: "bg-blue-100 text-blue-800",
+    EVALUATING: "bg-blue-100 text-blue-800",
+    NEED_REVIEW: "bg-blue-100 text-blue-800",
+    DONE: "bg-green-100 text-green-800",
+    CANCELED: "bg-red-100 text-red-800",
   };
 
   return (
@@ -115,7 +55,7 @@ const StatusBadge = ({ status }) => {
         statusStyles[status] || "bg-gray-100 text-gray-800"
       }`}
     >
-      {status}
+      {status.replace(/_/g, " ")}
     </span>
   );
 };
@@ -129,13 +69,13 @@ const AvatarGroup = ({ evaluators }) => {
     <div className="flex -space-x-2">
       <TooltipProvider>
         {displayedEvaluators.map((evaluator) => (
-          <Tooltip key={evaluator.id}>
+          <Tooltip key={evaluator.evaluator.id}>
             <TooltipTrigger asChild>
               <div className="relative">
                 <Avatar className="h-6 w-6 border-2 border-background">
-                  <AvatarImage src={evaluator.avatar} alt={evaluator.name} />
+                  <AvatarImage src="" alt={evaluator.evaluator.name} />
                   <AvatarFallback>
-                    {evaluator.name
+                    {evaluator.evaluator.name
                       .split(" ")
                       .map((n) => n[0])
                       .join("")}
@@ -144,9 +84,9 @@ const AvatarGroup = ({ evaluators }) => {
               </div>
             </TooltipTrigger>
             <TooltipContent>
-              <p>{evaluator.name}</p>
+              <p>{evaluator.evaluator.name}</p>
               <p className="text-xs text-muted-foreground">
-                {evaluator.jabatan}
+                {evaluator.evaluator.nip}
               </p>
             </TooltipContent>
           </Tooltip>
@@ -160,10 +100,10 @@ const AvatarGroup = ({ evaluators }) => {
             </TooltipTrigger>
             <TooltipContent>
               {evaluators.slice(displayLimit).map((evaluator) => (
-                <div key={evaluator.id}>
-                  <p>{evaluator.name}</p>
+                <div key={evaluator.evaluator.id}>
+                  <p>{evaluator.evaluator.name}</p>
                   <p className="text-xs text-muted-foreground">
-                    {evaluator.jabatan}
+                    {evaluator.evaluator.nip}
                   </p>
                 </div>
               ))}
@@ -175,7 +115,7 @@ const AvatarGroup = ({ evaluators }) => {
   );
 };
 
-export function RoomsGrid({ search, status, onStartRoom }) {
+export function RoomsGrid({ search, status, onStartRoom, assessments }) {
   const router = useRouter();
 
   const handleCancelRoom = (room) => {
@@ -187,33 +127,43 @@ export function RoomsGrid({ search, status, onStartRoom }) {
   };
 
   const handleRoomAction = (room) => {
-    if (room.participant.status === "SCHEDULED") {
+    const scheduledStatuses = ["CREATED", "SCHEDULED", "RESCHEDULE"];
+    if (scheduledStatuses.includes(room.status)) {
       onStartRoom(room);
     } else {
       router.push(`/dashboard/rooms/${room.id}`);
     }
   };
 
+  const isCompletedStatus = (status) => {
+    return STATUS_GROUPS.complete.includes(status);
+  };
+
   const RoomCard = ({ room, index }) => (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      whileHover={{ scale: 1.05 }} // Add zoom effect on hover
+      whileHover={{ scale: 1.05 }}
       transition={{ duration: 0.2, delay: index * 0.1 }}
     >
       <Card className="rounded-3xl transition-shadow hover:shadow-lg">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <div className="flex items-center gap-2">
-            <StatusBadge status={room.participant.status} />
-            {room.metodePelaksanaan === "online" ? (
+            <StatusBadge status={room.status} />
+            {room.metodePelaksanaan === "ONLINE" ? (
               <span
                 className={`flex items-center space-x-2 rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-800`}
               >
                 <Video className="h-3 w-3" />
-                <div>{room.metodePelaksanaan.toUpperCase()}</div>
+                <div>{room.metodePelaksanaan}</div>
               </span>
             ) : (
-              <MapPin className="h-4 w-4 text-green-500" />
+              <span
+                className={`flex items-center space-x-2 rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-800`}
+              >
+                <MapPin className="h-3 w-3" />
+                <div>{room.metodePelaksanaan}</div>
+              </span>
             )}
           </div>
           <DropdownMenu>
@@ -223,7 +173,7 @@ export function RoomsGrid({ search, status, onStartRoom }) {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              {room.participant.status !== "COMPLETED" && (
+              {!isCompletedStatus(room.status) && (
                 <>
                   <DropdownMenuItem
                     className="text-red-600"
@@ -231,7 +181,7 @@ export function RoomsGrid({ search, status, onStartRoom }) {
                   >
                     Cancel Room
                   </DropdownMenuItem>
-                  {room.participant.status === "IN_PROGRESS" && (
+                  {STATUS_GROUPS.ongoing.includes(room.status) && (
                     <DropdownMenuItem
                       className="text-red-600"
                       onClick={() => handleStopRoom(room)}
@@ -251,8 +201,8 @@ export function RoomsGrid({ search, status, onStartRoom }) {
                 {room.judul}
               </h3>
               <p className="text-xs text-muted-foreground">
-                {room.metodePelaksanaan === "online"
-                  ? room.linkOnline
+                {room.metodePelaksanaan === "ONLINE"
+                  ? room.linkMeeting
                   : room.ruangan}
               </p>
             </div>
@@ -260,29 +210,18 @@ export function RoomsGrid({ search, status, onStartRoom }) {
             <div className="flex items-center justify-between text-sm">
               <div className="flex items-center gap-2">
                 <span className="text-2xl font-semibold text-slate-600">
-                  {format(new Date(room.participant.schedule), "d MMM, HH:mm")}
+                  {format(new Date(room.schedule), "d MMM, HH:mm")}
                 </span>
               </div>
-              {/* <div className="flex items-center gap-2">
-                <div className="text-right">
-                  <p className="font-medium">{room.participant.name}</p>
-                  <p className="text-xs text-muted-foreground">
-                    {room.participant.jabatan}
-                  </p>
-                </div>
-              </div> */}
             </div>
 
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <AvatarGroup evaluators={room.evaluators} />
+                <AvatarGroup evaluators={room.evaluations} />
                 <div className="mx-2 h-6 border-l border-gray-300" />
                 <div className="flex items-center gap-2">
                   <Avatar className="h-6 w-6 border-2 border-background">
-                    <AvatarImage
-                      src={room.participant.avatar}
-                      alt={room.participant.name}
-                    />
+                    <AvatarImage src="" alt={room.participant.name} />
                     <AvatarFallback>
                       {room.participant.name
                         .split(" ")
@@ -293,19 +232,18 @@ export function RoomsGrid({ search, status, onStartRoom }) {
                   <p className="font-medium">{room.participant.name}</p>
                 </div>
               </div>
-              {room.participant.status !== "COMPLETED" &&
-                room.participant.status !== "CANCELLED" && (
-                  <motion.div
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                  >
-                    <Button size="sm" onClick={() => handleRoomAction(room)}>
-                      {room.participant.status === "SCHEDULED"
-                        ? "Start Now"
-                        : "Join"}
-                    </Button>
-                  </motion.div>
-                )}
+              {!isCompletedStatus(room.status) && (
+                <motion.div
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  <Button size="sm" onClick={() => handleRoomAction(room)}>
+                    {STATUS_GROUPS.scheduled.includes(room.status)
+                      ? "Start Now"
+                      : "Join"}
+                  </Button>
+                </motion.div>
+              )}
             </div>
           </div>
         </CardContent>
@@ -313,49 +251,37 @@ export function RoomsGrid({ search, status, onStartRoom }) {
     </motion.div>
   );
 
-  // Filter rooms based on search and status
-  const filteredRooms = mockRooms
-    .flatMap((room) =>
-      room.participants.map((participant) => ({
-        ...room,
-        participant,
-      }))
-    )
-    .filter((room) => {
-      const matchesSearch =
-        search.toLowerCase() === "" ||
-        room.judul.toLowerCase().includes(search.toLowerCase()) ||
-        room.participant.name.toLowerCase().includes(search.toLowerCase()) ||
-        room.participant.nip.includes(search);
+  // Filter assessments based on search and status
+  const filteredRooms = assessments.filter((room) => {
+    const matchesSearch =
+      search.toLowerCase() === "" ||
+      room.judul.toLowerCase().includes(search.toLowerCase()) ||
+      room.participant.name.toLowerCase().includes(search.toLowerCase()) ||
+      room.participant.nip.includes(search);
 
-      const matchesStatus =
-        status === "All" || room.participant.status === status;
+    const matchesStatus = status === "All" || room.status === status;
 
-      return matchesSearch && matchesStatus;
-    });
+    return matchesSearch && matchesStatus;
+  });
 
-  // Group rooms by status
+  // Group rooms by their statuses
   const groupedRooms = {
-    SCHEDULED: filteredRooms.filter(
-      (room) => room.participant.status === "SCHEDULED"
+    scheduled: filteredRooms.filter((room) =>
+      STATUS_GROUPS.scheduled.includes(room.status)
     ),
-    IN_PROGRESS: filteredRooms.filter(
-      (room) => room.participant.status === "IN_PROGRESS"
+    ongoing: filteredRooms.filter((room) =>
+      STATUS_GROUPS.ongoing.includes(room.status)
     ),
-    COMPLETED: filteredRooms.filter(
-      (room) => room.participant.status === "COMPLETED"
-    ),
-    CANCELLED: filteredRooms.filter(
-      (room) => room.participant.status === "CANCELLED"
+    complete: filteredRooms.filter((room) =>
+      STATUS_GROUPS.complete.includes(room.status)
     ),
   };
 
   // Status group titles and their order
   const statusGroups = [
-    { key: "SCHEDULED", title: "Scheduled Assessments" },
-    { key: "IN_PROGRESS", title: "Ongoing Assessments" },
-    { key: "COMPLETED", title: "Completed Assessments" },
-    { key: "CANCELLED", title: "Cancelled Assessments" },
+    { key: "scheduled", title: "Scheduled Assessments" },
+    { key: "ongoing", title: "Ongoing Assessments" },
+    { key: "complete", title: "Completed Assessments" },
   ];
 
   return (
@@ -375,11 +301,7 @@ export function RoomsGrid({ search, status, onStartRoom }) {
             <h2 className="text-xl font-semibold tracking-tight">{title}</h2>
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
               {rooms.map((room, index) => (
-                <RoomCard
-                  key={`${room.id}-${room.participant.id}`}
-                  room={room}
-                  index={index}
-                />
+                <RoomCard key={room.id} room={room} index={index} />
               ))}
             </div>
           </motion.div>

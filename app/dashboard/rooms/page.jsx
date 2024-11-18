@@ -1,6 +1,6 @@
 "use client";
 import { motion } from "framer-motion";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { RoomsHeader } from "@/components/rooms/rooms-header";
 import { RoomsFilters } from "@/components/rooms/rooms-filters";
 import { RoomsGrid } from "@/components/rooms/rooms-grid";
@@ -14,12 +14,46 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { useAuth } from "@/hooks/use-auth";
+import { API_ENDPOINTS } from "@/config/api";
 
 export default function RoomsPage() {
+  const { session } = useAuth(); // Accessing session from useAuth
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState("All");
   const [startDialogOpen, setStartDialogOpen] = useState(false);
   const [selectedRoom, setSelectedRoom] = useState(null);
+  const [assessments, setAssessments] = useState([]);
+
+  const fetchAssessments = async () => {
+    try {
+      const response = await fetch(API_ENDPOINTS.ASSESSMENTS.LIST, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${session?.accessToken}`, // Using session.accessToken
+        },
+      });
+      if (!response.ok) {
+        throw new Error("Failed to fetch users");
+      }
+      const result = await response.json();
+
+      if (result.success) {
+        setAssessments(result.data);
+        console.log(result.data);
+      } else {
+        console.error(result.message);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  useEffect(() => {
+    if (session) {
+      fetchAssessments();
+    }
+  }, [session]);
 
   const handleStartRoom = (room) => {
     setSelectedRoom(room);
@@ -50,6 +84,7 @@ export default function RoomsPage() {
         search={search}
         status={status}
         onStartRoom={handleStartRoom}
+        assessments={assessments}
       />
 
       <AlertDialog open={startDialogOpen} onOpenChange={setStartDialogOpen}>
