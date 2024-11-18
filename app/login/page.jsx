@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { useToast } from "@/hooks/use-toast";
+import { Zap } from "lucide-react";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -61,16 +62,19 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="grid min-h-screen lg:grid-cols-2">
+    <div className="grid min-h-screen bg-gradient-to-br from-yellow-300 to-orange-200 lg:grid-cols-2">
       <div className="relative hidden lg:block">
         <div className="absolute inset-0 bg-[#13121c]">
-          <div className="h-full w-full bg-gradient-to-br from-primary/20 to-secondary/20" />
+          <div className="h-full w-full bg-gradient-to-br from-yellow-300 to-orange-200" />
         </div>
-        <div className="absolute bottom-4 left-4 text-sm text-white/80">
-          TalentTune
-        </div>
+        <Link href="/">
+          <div className="absolute left-4 top-4 flex space-x-3 text-sm">
+            <Zap className="h-5 w-5" />
+            <strong>TalentTune</strong>
+          </div>
+        </Link>
       </div>
-      <div className="flex items-center justify-center rounded-2xl p-8">
+      <div className="flex items-center justify-center bg-white p-8 lg:rounded-l-2xl">
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
