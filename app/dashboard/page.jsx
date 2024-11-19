@@ -81,7 +81,7 @@ export default function DashboardPage() {
                       <BarChartIcon className="h-4 w-4 text-purple-500" />
                     </div>
                     <div className="flex items-baseline space-x-2">
-                      <span className="text-3xl font-semibold">1,081</span>
+                      <span className="text-3xl font-semibold">12</span>
                       <span className="text-sm font-medium text-purple-500">
                         All
                       </span>
@@ -99,7 +99,7 @@ export default function DashboardPage() {
                       <CalendarIcon className="h-4 w-4 text-blue-500" />
                     </div>
                     <div className="flex items-baseline space-x-2">
-                      <span className="text-3xl font-semibold">42</span>
+                      <span className="text-3xl font-semibold">5</span>
                       <span className="text-sm font-medium text-blue-500">
                         Upcoming
                       </span>
@@ -117,7 +117,7 @@ export default function DashboardPage() {
                       <ClockIcon className="h-4 w-4 text-yellow-500" />
                     </div>
                     <div className="flex items-baseline space-x-2">
-                      <span className="text-3xl font-semibold">18</span>
+                      <span className="text-3xl font-semibold">3</span>
                       <span className="text-sm font-medium text-yellow-500">
                         Active
                       </span>
@@ -135,7 +135,7 @@ export default function DashboardPage() {
                       <CheckCircleIcon className="h-4 w-4 text-green-500" />
                     </div>
                     <div className="flex items-baseline space-x-2">
-                      <span className="text-3xl font-semibold">1,021</span>
+                      <span className="text-3xl font-semibold">9</span>
                       <span className="text-sm font-medium text-green-500">
                         +5%
                       </span>

@@ -8,8 +8,8 @@ export function Providers({ children }) {
     <SessionProvider>
       <NextThemesProvider
         attribute="class"
-        defaultTheme="system"
-        enableSystem
+        defaultTheme="light"
+        enableSystem={false} // Disable system theme detection
         disableTransitionOnChange
       >
         {children}

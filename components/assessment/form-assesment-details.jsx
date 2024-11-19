@@ -8,7 +8,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { MapPin, Wifi } from "lucide-react";
+import { MapPin, Wifi, Check } from "lucide-react";
 
 export function AssessmentDetails({ formData, setFormData }) {
   const handleInputChange = (e) => {
@@ -86,7 +86,7 @@ export function AssessmentDetails({ formData, setFormData }) {
           onValueChange={handleSelectChange("metodePelaksanaan")}
           className="grid grid-cols-3 gap-4 pt-2"
         >
-          <div>
+          <div className="relative">
             <RadioGroupItem
               value="OFFLINE"
               id="offline"
@@ -94,13 +94,16 @@ export function AssessmentDetails({ formData, setFormData }) {
             />
             <Label
               htmlFor="offline"
-              className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary"
+              className="group relative flex cursor-pointer flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary"
             >
+              <div className="absolute -right-2 -top-2 hidden h-6 w-6 items-center justify-center rounded-full bg-primary text-white transition-transform group-hover:scale-105 peer-data-[state=checked]:flex">
+                <Check className="h-4 w-4" />
+              </div>
               <MapPin className="mb-3 h-6 w-6" />
               Offline
             </Label>
           </div>
-          <div>
+          <div className="relative">
             <RadioGroupItem
               value="ONLINE"
               id="online"
@@ -108,13 +111,16 @@ export function AssessmentDetails({ formData, setFormData }) {
             />
             <Label
               htmlFor="online"
-              className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary"
+              className="group relative flex cursor-pointer flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary"
             >
+              <div className="absolute -right-2 -top-2 hidden h-6 w-6 items-center justify-center rounded-full bg-primary text-white transition-transform group-hover:scale-105 peer-data-[state=checked]:flex">
+                <Check className="h-4 w-4" />
+              </div>
               <Wifi className="mb-3 h-6 w-6" />
               Online
             </Label>
           </div>
-          <div>
+          <div className="relative">
             <RadioGroupItem
               value="HYBRID"
               id="hybrid"
@@ -122,8 +128,11 @@ export function AssessmentDetails({ formData, setFormData }) {
             />
             <Label
               htmlFor="hybrid"
-              className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary"
+              className="group relative flex cursor-pointer flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary"
             >
+              <div className="absolute -right-2 -top-2 hidden h-6 w-6 items-center justify-center rounded-full bg-primary text-white transition-transform group-hover:scale-105 peer-data-[state=checked]:flex">
+                <Check className="h-4 w-4" />
+              </div>
               <div className="mb-3 flex">
                 <MapPin className="mr-1 h-6 w-6" />
                 <Wifi className="h-6 w-6" />
@@ -167,23 +176,23 @@ export function AssessmentDetails({ formData, setFormData }) {
       )}
       <div>
         <Label htmlFor="notaDinas">Nota Dinas</Label>
-        <div className="grid w-full items-center gap-1.5">
-          <Input
+        <div className="grid w-full items-center gap-1.5 pt-2">
+          <input
             id="notaDinas"
             name="notaDinas"
             type="file"
             accept=".pdf,.doc,.docx"
             onChange={handleInputChange}
-            className="cursor-pointer file:mr-4 file:rounded-full file:border-0 file:bg-primary file:px-4 file:py-2 file:text-sm file:font-semibold file:text-primary-foreground hover:file:bg-primary/90"
+            className="cursor-pointer text-sm file:mr-4 file:rounded-full file:border-0 file:bg-primary file:px-4 file:py-2 file:text-xs file:font-semibold file:text-primary-foreground hover:file:bg-primary/90"
           />
-          <p className="text-sm text-muted-foreground">
+          <p className="text-xs text-muted-foreground">
             Accepted formats: PDF, DOC, DOCX
           </p>
-          {formData.assessment.notaDinas && (
-            <p className="text-sm text-muted-foreground">
+          {/* {formData.assessment.notaDinas && (
+            <p className="text-xs text-muted-foreground">
               Selected file: {formData.assessment.notaDinas.name}
             </p>
-          )}
+          )} */}
         </div>
       </div>
     </div>
