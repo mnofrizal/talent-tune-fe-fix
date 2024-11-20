@@ -8,7 +8,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { MapPin, Wifi, Check } from "lucide-react";
+import { MapPin, Wifi, Check, X, FileText, Upload } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 export function AssessmentDetails({ formData, setFormData }) {
   const handleInputChange = (e) => {
@@ -37,27 +38,37 @@ export function AssessmentDetails({ formData, setFormData }) {
     }));
   };
 
+  const handleFileRemove = () => {
+    setFormData((prev) => ({
+      ...prev,
+      assessment: {
+        ...prev.assessment,
+        notaDinas: null,
+      },
+    }));
+  };
+
   return (
     <div className="space-y-6">
       <div>
-        <Label htmlFor="judul">Judul</Label>
+        <Label htmlFor="judul">Judul Proyeksi</Label>
         <Input
           id="judul"
           name="judul"
           value={formData.assessment.judul}
           onChange={handleInputChange}
-          placeholder="Leadership Assessment Q1 2024"
+          placeholder="Judul proyeksi bidang"
           required
         />
       </div>
       <div>
-        <Label htmlFor="materi">Materi</Label>
+        <Label htmlFor="materi">Materi PPT</Label>
         <Input
           id="materi"
           name="materi"
           value={formData.assessment.materi}
           onChange={handleInputChange}
-          placeholder="Leadership Competency Evaluation"
+          placeholder="Peran bidang dalam organisasi"
           required
         />
       </div>
@@ -73,6 +84,7 @@ export function AssessmentDetails({ formData, setFormData }) {
             <SelectValue placeholder="Pilih Proyeksi" />
           </SelectTrigger>
           <SelectContent>
+            <SelectItem value="GENERALIS_1">Generalis 1</SelectItem>
             <SelectItem value="GENERALIS_2">Generalis 2</SelectItem>
             <SelectItem value="GENERALIS_3">Generalis 3</SelectItem>
           </SelectContent>
@@ -155,9 +167,15 @@ export function AssessmentDetails({ formData, setFormData }) {
               <SelectValue placeholder="Pilih Ruangan" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="ROOM_A">Meeting Room A</SelectItem>
-              <SelectItem value="ROOM_B">Meeting Room B</SelectItem>
-              <SelectItem value="ROOM_C">Meeting Room C</SelectItem>
+              <SelectItem value="ROOM_VICON">
+                Ruang Vicon Zainudin Sayuti
+              </SelectItem>
+              <SelectItem value="ROOM_IHT_SUDADIJO">
+                Ruang IHT Sudadijo
+              </SelectItem>
+              <SelectItem value="ROOM_IHT_HARIJANTO">
+                Ruang IHT Ahmad Harijanto
+              </SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -177,22 +195,45 @@ export function AssessmentDetails({ formData, setFormData }) {
       <div>
         <Label htmlFor="notaDinas">Nota Dinas</Label>
         <div className="grid w-full items-center gap-1.5 pt-2">
-          <input
-            id="notaDinas"
-            name="notaDinas"
-            type="file"
-            accept=".pdf,.doc,.docx"
-            onChange={handleInputChange}
-            className="cursor-pointer text-sm file:mr-4 file:rounded-full file:border-0 file:bg-primary file:px-4 file:py-2 file:text-xs file:font-semibold file:text-primary-foreground hover:file:bg-primary/90"
-          />
-          <p className="text-xs text-muted-foreground">
-            Accepted formats: PDF, DOC, DOCX
-          </p>
-          {/* {formData.assessment.notaDinas && (
-            <p className="text-xs text-muted-foreground">
-              Selected file: {formData.assessment.notaDinas.name}
-            </p>
-          )} */}
+          {formData.assessment.notaDinas ? (
+            <div className="flex items-center justify-between rounded-lg border border-border bg-card p-3">
+              <div className="flex items-center space-x-3">
+                <div className="rounded-full bg-primary/10 p-2">
+                  <FileText className="h-5 w-5 text-primary" />
+                </div>
+                <div>
+                  <p className="text-sm font-medium">
+                    {formData.assessment.notaDinas.name}
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    {(formData.assessment.notaDinas.size / 1024).toFixed(2)} KB
+                  </p>
+                </div>
+              </div>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8 text-muted-foreground hover:text-foreground"
+                onClick={handleFileRemove}
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            </div>
+          ) : (
+            <div className="items-center gap-2 space-y-2">
+              <input
+                id="notaDinas"
+                name="notaDinas"
+                type="file"
+                accept=".pdf,.doc,.docx"
+                onChange={handleInputChange}
+                className="cursor-pointer text-sm file:mr-4 file:rounded-full file:border-0 file:bg-primary file:px-4 file:py-2 file:text-xs file:font-semibold file:text-primary-foreground hover:file:bg-primary/90"
+              />
+              <p className="text-xs text-muted-foreground">
+                Accepted formats: PDF, DOC, DOCX
+              </p>
+            </div>
+          )}
         </div>
       </div>
     </div>

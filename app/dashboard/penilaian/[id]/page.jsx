@@ -1,18 +1,13 @@
 "use client";
-import React, { useState, useEffect } from "react";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
+import React, { useState, useEffect, memo, useMemo } from "react";
 import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { CheckCircle } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Progress } from "@/components/ui/progress";
+import { Separator } from "@/components/ui/separator";
 
 const questions = [
   {
@@ -60,79 +55,137 @@ const participantInfo = {
   status: "IN_PROGRESS",
 };
 
-export default function Component({ id = "" }) {
-  const [states, setStates] = useState(
-    Object.fromEntries(questions.map((q) => [q.id, { rating: "", notes: "" }]))
-  );
-  const [initialStates, setInitialStates] = useState(
-    Object.fromEntries(questions.map((q) => [q.id, { rating: "", notes: "" }]))
-  );
-  const [completed, setCompleted] = useState(
-    Object.fromEntries(questions.map((q) => [q.id, false]))
-  );
-  const [canSubmit, setCanSubmit] = useState(false);
-  const [openItem, setOpenItem] = useState(undefined);
-  const [triggerClose, setTriggerClose] = useState(false);
-  const [completedQuestions, setCompletedQuestions] = useState(0);
+const QuestionItem = memo(
+  ({ question, index, state, onStateChange, completed }) => {
+    const handleChange = (field, value) => {
+      onStateChange(question.id, field, value);
+    };
 
-  useEffect(() => {
-    setCanSubmit(Object.values(completed).every(Boolean));
-    const completedCount = Object.values(completed).filter(Boolean).length;
-    setCompletedQuestions(completedCount);
-  }, [completed]);
-
-  useEffect(() => {
-    if (triggerClose) {
-      setOpenItem(undefined);
-      setTriggerClose(false);
-    }
-  }, [triggerClose]);
-
-  const handleSave = (questionId) => {
-    setCompleted((prev) => {
-      const newCompleted = { ...prev, [questionId]: true };
-      const completedCount = Object.values(newCompleted).filter(Boolean).length;
-      setCompletedQuestions(completedCount);
-      return newCompleted;
-    });
-    setInitialStates((prev) => ({
-      ...prev,
-      [questionId]: { ...states[questionId] },
-    }));
-    setTriggerClose(true);
-  };
-
-  const isSaveEnabled = (questionId) => {
-    const currentState = states[questionId];
-    const initialState = initialStates[questionId];
-
-    if (questionId === "conclusion") {
+    if (question.id === "conclusion") {
       return (
-        currentState.notes !== "" && currentState.notes !== initialState.notes
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <span className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-50 text-sm text-blue-600">
+                {index + 1}
+              </span>
+              <h3 className="text-lg font-semibold">{question.title}</h3>
+            </div>
+            {completed && <CheckCircle className="h-5 w-5 text-green-500" />}
+          </div>
+          <p className="text-sm text-muted-foreground">
+            {question.description}
+          </p>
+          <div className="pt-2">
+            <Textarea
+              value={state.notes}
+              onChange={(e) => handleChange("notes", e.target.value)}
+              placeholder="Tuliskan kesimpulan dan rekomendasi..."
+              className="min-h-[100px]"
+            />
+          </div>
+        </div>
       );
     }
 
     return (
-      currentState.rating !== "" && currentState.rating !== initialState.rating
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <span className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-50 text-sm text-blue-600">
+              {index + 1}
+            </span>
+            <h3 className="text-lg font-semibold">{question.title}</h3>
+          </div>
+          {completed && <CheckCircle className="h-5 w-5 text-green-500" />}
+        </div>
+        <p className="text-sm text-muted-foreground">{question.description}</p>
+        <div className="space-y-4">
+          <Label className="text-sm font-medium">Penilaian</Label>
+          <div className="flex gap-4">
+            {ratingOptions.map((option) => (
+              <div key={option.value} className="flex-1">
+                <input
+                  type="radio"
+                  id={`${question.id}-${option.value}`}
+                  name={`${question.id}-rating`}
+                  value={option.value}
+                  checked={state.rating === option.value}
+                  onChange={() => handleChange("rating", option.value)}
+                  className="sr-only"
+                />
+                <label
+                  htmlFor={`${question.id}-${option.value}`}
+                  className={`flex flex-col items-center justify-center h-full p-2 border rounded-lg cursor-pointer transition-all ${
+                    state.rating === option.value
+                      ? "border-primary bg-primary/5"
+                      : "border-gray-200 hover:border-primary/50"
+                  }`}
+                >
+                  <div className="flex flex-col items-center gap-1">
+                    <span className="text-sm font-medium">{option.label}</span>
+                    <span className="text-xs text-gray-500">
+                      {option.number}
+                    </span>
+                  </div>
+                </label>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
     );
-  };
+  }
+);
+
+QuestionItem.displayName = "QuestionItem";
+
+export default function Component({ id = "" }) {
+  const [states, setStates] = useState(
+    Object.fromEntries(questions.map((q) => [q.id, { rating: "", notes: "" }]))
+  );
+
+  const { completed, canSubmit, completedQuestions } = useMemo(() => {
+    const isCompleted = (questionId, state) => {
+      if (questionId === "conclusion") {
+        return state.notes.trim() !== "";
+      }
+      return state.rating !== "";
+    };
+
+    const completedStates = Object.entries(states).reduce(
+      (acc, [id, state]) => {
+        acc[id] = isCompleted(id, state);
+        return acc;
+      },
+      {}
+    );
+
+    return {
+      completed: completedStates,
+      canSubmit: Object.values(completedStates).every(Boolean),
+      completedQuestions: Object.values(completedStates).filter(Boolean).length,
+    };
+  }, [states]);
 
   const handleChange = (questionId, field, value) => {
     setStates((prev) => ({
       ...prev,
-      [questionId]: { ...prev[questionId], [field]: value },
+      [questionId]: {
+        ...prev[questionId],
+        [field]: value,
+      },
     }));
-    // Remove the automatic completion when rating changes
   };
 
   return (
     <div className="w-full max-w-7xl">
-      <div className="mb-6 flex items-center justify-between">
+      <div className="mb-4 flex items-center justify-between">
         <h1 className="text-2xl font-bold">Evaluation Form</h1>
         <Button disabled={!canSubmit}>Submit Evaluation</Button>
       </div>
 
-      <div className="mb-6">
+      <div className="mb-4">
         <Progress
           value={(completedQuestions / questions.length) * 100}
           className="w-full"
@@ -144,116 +197,27 @@ export default function Component({ id = "" }) {
 
       <div className="grid grid-cols-6 gap-6">
         <div className="col-span-4">
-          <Accordion
-            type="single"
-            collapsible
-            value={openItem}
-            onValueChange={setOpenItem}
-            className="w-full space-y-4"
-            key={triggerClose ? "closed" : "open"}
-          >
-            {questions.map((question, index) => (
-              <AccordionItem
-                key={question.id}
-                value={question.id}
-                className="rounded-lg border bg-white px-6"
-              >
-                <AccordionTrigger className="py-4 text-lg font-semibold">
-                  <span className="flex items-center gap-3">
-                    <span className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-50 text-sm text-blue-600">
-                      {index + 1}
-                    </span>
-                    {question.title}
-                    {completed[question.id] && (
-                      <CheckCircle className="h-5 w-5 text-green-500" />
-                    )}
-                  </span>
-                </AccordionTrigger>
-                <AccordionContent className="space-y-6 pb-6">
-                  <p className="text-sm text-muted-foreground">
-                    {question.description}
-                  </p>
-
-                  {question.id !== "conclusion" && (
-                    <div className="space-y-4">
-                      <Label className="text-sm font-medium">Penilaian</Label>
-                      <div className="flex gap-4">
-                        {ratingOptions.map((option) => (
-                          <div key={option.value} className="flex-1">
-                            <input
-                              type="radio"
-                              id={`${question.id}-${option.value}`}
-                              name={`${question.id}-rating`}
-                              value={option.value}
-                              checked={
-                                states[question.id].rating === option.value
-                              }
-                              onChange={() =>
-                                handleChange(
-                                  question.id,
-                                  "rating",
-                                  option.value
-                                )
-                              }
-                              className="sr-only"
-                            />
-                            <label
-                              htmlFor={`${question.id}-${option.value}`}
-                              className={`flex flex-col items-center justify-center h-full p-4 border rounded-lg cursor-pointer transition-all ${
-                                states[question.id].rating === option.value
-                                  ? "border-primary bg-primary/5"
-                                  : "border-gray-200 hover:border-primary/50"
-                              }`}
-                            >
-                              <div className="flex flex-col items-center gap-1">
-                                <span className="text-sm font-medium">
-                                  {option.label}
-                                </span>
-                                <span className="text-xs text-gray-500">
-                                  {option.number}
-                                </span>
-                              </div>
-                            </label>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
+          <Card>
+            <CardHeader>
+              <CardTitle>Penilaian</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              {questions.map((question, index) => (
+                <React.Fragment key={question.id}>
+                  <QuestionItem
+                    question={question}
+                    index={index}
+                    state={states[question.id]}
+                    onStateChange={handleChange}
+                    completed={completed[question.id]}
+                  />
+                  {index < questions.length - 1 && (
+                    <Separator className="my-6" />
                   )}
-
-                  <div className="space-y-2">
-                    <Label
-                      htmlFor={`notes-${question.id}`}
-                      className="text-sm font-medium"
-                    >
-                      {question.id === "conclusion"
-                        ? "Kesimpulan & Rekomendasi"
-                        : "Catatan (Opsional)"}
-                    </Label>
-                    <Textarea
-                      id={`notes-${question.id}`}
-                      placeholder={
-                        question.id === "conclusion"
-                          ? "Tuliskan kesimpulan dan rekomendasi..."
-                          : "Tambahkan catatan di sini..."
-                      }
-                      className="min-h-[100px]"
-                      value={states[question.id].notes}
-                      onChange={(e) =>
-                        handleChange(question.id, "notes", e.target.value)
-                      }
-                    />
-                  </div>
-
-                  <Button
-                    onClick={() => handleSave(question.id)}
-                    disabled={!isSaveEnabled(question.id)}
-                  >
-                    {completed[question.id] ? "Saved" : "Save"}
-                  </Button>
-                </AccordionContent>
-              </AccordionItem>
-            ))}
-          </Accordion>
+                </React.Fragment>
+              ))}
+            </CardContent>
+          </Card>
         </div>
 
         <div className="col-span-2">

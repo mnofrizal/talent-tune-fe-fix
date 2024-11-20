@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/select";
 import { Card, CardContent } from "@/components/ui/card";
 import { X } from "lucide-react";
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 
 export function ParticipantSelection({ formData, setFormData, candidates }) {
   // Filter out users who are already evaluators
@@ -101,12 +102,42 @@ export function ParticipantSelection({ formData, setFormData, candidates }) {
               <Card key={participant.participantId}>
                 <CardContent className="flex items-center p-4">
                   <div className="flex-grow">
-                    <h3 className="font-semibold">{participantData?.name}</h3>
-                    {participantData?.jabatan && (
-                      <p className="text-sm text-muted-foreground">
-                        {participantData.jabatan}
-                      </p>
-                    )}
+                    <div className="flex items-center justify-between gap-3">
+                      <div className="flex items-center gap-3">
+                        <Avatar className="h-10 w-10 ring-2 ring-white">
+                          <AvatarImage
+                            src="/avatars/01.png"
+                            alt={participantData.name}
+                          />
+                          <AvatarFallback>
+                            {participantData?.name
+                              ? participantData?.name.charAt(0)
+                              : "JD"}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div>
+                          <h3 className="font-semibold">
+                            {participantData?.name}
+                          </h3>
+                          {participantData?.jabatan && (
+                            <p className="text-sm text-muted-foreground">
+                              {participantData.jabatan}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() =>
+                          handleRemoveParticipant(participant.participantId)
+                        }
+                        aria-label="Remove participant"
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
+                    </div>
                     <Input
                       type="datetime-local"
                       value={participant.schedule || ""}
@@ -120,16 +151,6 @@ export function ParticipantSelection({ formData, setFormData, candidates }) {
                       required
                     />
                   </div>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() =>
-                      handleRemoveParticipant(participant.participantId)
-                    }
-                    aria-label="Remove participant"
-                  >
-                    <X className="h-4 w-4" />
-                  </Button>
                 </CardContent>
               </Card>
             );

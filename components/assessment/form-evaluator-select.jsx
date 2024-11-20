@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/select";
 import { Card, CardContent } from "@/components/ui/card";
 import { X } from "lucide-react";
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 
 export function EvaluatorSelection({ formData, setFormData, evaluators }) {
   const handleEvaluatorSelect = (evaluatorId) => {
@@ -58,13 +59,26 @@ export function EvaluatorSelection({ formData, setFormData, evaluators }) {
             return (
               <Card key={evaluator.evaluatorId}>
                 <CardContent className="flex items-center justify-between p-4">
-                  <div>
-                    <h3 className="font-semibold">{evaluatorData?.name}</h3>
-                    {evaluatorData?.jabatan && (
-                      <p className="text-sm text-muted-foreground">
-                        {evaluatorData.jabatan}
-                      </p>
-                    )}
+                  <div className="flex items-center gap-4">
+                    <Avatar className="h-10 w-10 ring-2 ring-white">
+                      <AvatarImage
+                        src="/avatars/01.png"
+                        alt={evaluatorData.name}
+                      />
+                      <AvatarFallback>
+                        {evaluatorData?.name
+                          ? evaluatorData?.name.charAt(0)
+                          : "JD"}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div>
+                      <h3 className="font-semibold">{evaluatorData?.name}</h3>
+                      {evaluatorData?.jabatan && (
+                        <p className="text-sm text-muted-foreground">
+                          {evaluatorData.jabatan}
+                        </p>
+                      )}
+                    </div>
                   </div>
                   <Button
                     variant="ghost"

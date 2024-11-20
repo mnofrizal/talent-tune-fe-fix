@@ -121,6 +121,25 @@ export function NewAssessmentForm({ onAssessmentCreated }) {
     if (step > 1) setStep(step - 1);
   };
 
+  const handleCancel = () => {
+    setIsOpen(false);
+    setStep(1);
+    setFormData({
+      assessment: {
+        judul: "",
+        materi: "",
+        proyeksi: "",
+        metodePelaksanaan: "OFFLINE",
+        ruangan: "",
+        linkMeeting: null,
+        notaDinas: null,
+        participants: [],
+        isActive: true,
+      },
+      evaluators: [],
+    });
+  };
+
   const renderStep = () => {
     switch (step) {
       case 1:
@@ -248,9 +267,6 @@ export function NewAssessmentForm({ onAssessmentCreated }) {
         </Button>
       </DialogTrigger>
       <DialogContent className="rounded-2xl sm:max-w-[425px] md:max-w-[700px]">
-        <DialogHeader>
-          <DialogTitle>Create New Assessment</DialogTitle>
-        </DialogHeader>
         <Card className="w-full rounded-2xl">
           <CardHeader>
             <CardTitle>
@@ -265,35 +281,42 @@ export function NewAssessmentForm({ onAssessmentCreated }) {
           <form onSubmit={handleSubmit}>
             <CardContent>{renderStep()}</CardContent>
             <CardFooter className="flex justify-between">
-              {step > 1 && (
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={handlePreviousStep}
-                >
-                  Previous
+              <div className="flex gap-2">
+                {step > 1 && (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={handlePreviousStep}
+                  >
+                    Previous
+                  </Button>
+                )}
+              </div>
+              <div className="flex gap-2">
+                <Button type="button" variant="outline" onClick={handleCancel}>
+                  Cancel
                 </Button>
-              )}
-              {step < 3 ? (
-                <Button
-                  type="button"
-                  onClick={handleNextStep}
-                  disabled={!validateStep()}
-                >
-                  Next
-                </Button>
-              ) : (
-                <Button
-                  type="submit"
-                  disabled={!validateStep()}
-                  onClick={(e) => {
-                    console.log("Submit button clicked");
-                    handleSubmit(e);
-                  }}
-                >
-                  Submit
-                </Button>
-              )}
+                {step < 3 ? (
+                  <Button
+                    type="button"
+                    onClick={handleNextStep}
+                    disabled={!validateStep()}
+                  >
+                    Next
+                  </Button>
+                ) : (
+                  <Button
+                    type="submit"
+                    disabled={!validateStep()}
+                    onClick={(e) => {
+                      console.log("Submit button clicked");
+                      handleSubmit(e);
+                    }}
+                  >
+                    Submit
+                  </Button>
+                )}
+              </div>
             </CardFooter>
           </form>
         </Card>
