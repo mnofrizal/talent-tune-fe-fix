@@ -243,11 +243,18 @@ export function RoomsGrid({ search, status, onStartRoom, assessments }) {
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                 >
-                  <Button size="sm" onClick={() => handleRoomAction(room)}>
-                    {STATUS_GROUPS.scheduled.includes(room.status)
-                      ? "Start Now"
-                      : "Join"}
-                  </Button>
+                  {STATUS_GROUPS.scheduled.includes(room.status) ? (
+                    <Button size="sm" onClick={() => handleRoomAction(room)}>
+                      Start Now
+                    </Button>
+                  ) : (
+                    <Button
+                      size="sm"
+                      onClick={() => router.push(`/dashboard/rooms/${room.id}`)}
+                    >
+                      Join
+                    </Button>
+                  )}
                 </motion.div>
               )}
             </div>

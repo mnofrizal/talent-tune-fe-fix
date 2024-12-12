@@ -2,7 +2,6 @@
 
 import { useState, useRef, useEffect, useCallback } from "react";
 import { Button } from "@/components/ui/button";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   Select,
   SelectContent,
@@ -11,12 +10,12 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   ChevronLeft,
   ChevronRight,
   Maximize,
   Minimize,
-  X,
   Mic,
   MicOff,
   Video,
@@ -158,16 +157,33 @@ export default function SlideshowPresenter() {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [showNavigation, setShowNavigation] = useState(false);
+  const [visibleSlideStart, setVisibleSlideStart] = useState(0);
   const mainSlideRef = useRef(null);
   const navigationTimeoutRef = useRef(null);
 
   const goToNextSlide = useCallback(() => {
-    setCurrentSlide((prev) => (prev + 1) % slides.length);
-  }, []);
+    setCurrentSlide((prev) => {
+      const next = prev + 1;
+      if (next >= slides.length) return prev; // Prevent going past the last slide
+      if (next >= visibleSlideStart + 3) {
+        setVisibleSlideStart(
+          Math.min(slides.length - 3, visibleSlideStart + 1)
+        );
+      }
+      return next;
+    });
+  }, [visibleSlideStart]);
 
   const goToPreviousSlide = useCallback(() => {
-    setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length);
-  }, []);
+    setCurrentSlide((prev) => {
+      const next = prev - 1;
+      if (next < 0) return prev; // Prevent going before the first slide
+      if (next < visibleSlideStart) {
+        setVisibleSlideStart(Math.max(0, visibleSlideStart - 1));
+      }
+      return next;
+    });
+  }, [visibleSlideStart]);
 
   const toggleFullscreen = () => {
     if (!document.fullscreenElement) {
@@ -181,16 +197,17 @@ export default function SlideshowPresenter() {
     }
   };
 
-  const handleKeyDown = useCallback(
-    (event) => {
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      if (event.key === "ArrowRight" || event.key === " ") {
+        goToNextSlide();
+      } else if (event.key === "ArrowLeft") {
+        goToPreviousSlide();
+      } else if (event.key === "Escape" && isFullscreen) {
+        document.exitFullscreen();
+      }
+
       if (isFullscreen) {
-        if (event.key === "ArrowRight" || event.key === " ") {
-          goToNextSlide();
-        } else if (event.key === "ArrowLeft") {
-          goToPreviousSlide();
-        } else if (event.key === "Escape") {
-          document.exitFullscreen();
-        }
         setShowNavigation(true);
         if (navigationTimeoutRef.current) {
           clearTimeout(navigationTimeoutRef.current);
@@ -200,16 +217,20 @@ export default function SlideshowPresenter() {
           3000
         );
       }
-    },
-    [isFullscreen, goToNextSlide, goToPreviousSlide]
-  );
+    };
 
-  useEffect(() => {
     document.addEventListener("keydown", handleKeyDown);
     return () => {
       document.removeEventListener("keydown", handleKeyDown);
     };
-  }, [handleKeyDown]);
+  }, [isFullscreen, goToNextSlide, goToPreviousSlide]);
+
+  useEffect(() => {
+    const mainContainer = mainSlideRef.current;
+    if (mainContainer) {
+      mainContainer.focus();
+    }
+  }, []);
 
   useEffect(() => {
     const handleFullscreenChange = () => {
@@ -222,121 +243,163 @@ export default function SlideshowPresenter() {
   }, []);
 
   return (
-    <div className="flex h-full flex-col overflow-hidden rounded-2xl bg-background p-4 text-foreground">
-      {/* Header */}
-
-      {/* Main content */}
-      <div className="flex flex-1 overflow-hidden">
-        {/* Slides section */}
-        <section className="flex flex-grow flex-col overflow-hidden">
-          <div className="flex flex-grow items-center justify-center overflow-hidden bg-background p-4">
-            <div
-              ref={mainSlideRef}
-              className="relative h-0 w-full"
-              style={{ paddingTop: "56.25%" }} // 16:9 aspect ratio
+    <div className="grid h-full grid-cols-[1fr,300px] overflow-hidden rounded-2xl bg-background p-4 text-foreground">
+      <section className="flex flex-col overflow-hidden">
+        <div className="flex flex-grow items-center justify-center overflow-hidden bg-background p-4">
+          <div
+            ref={mainSlideRef}
+            className="relative h-0 w-full focus:outline-none"
+            style={{ paddingTop: "56.25%" }}
+            tabIndex={0}
+          >
+            <img
+              src={slides[currentSlide].image}
+              alt={slides[currentSlide].title}
+              className="absolute left-0 top-0 h-full w-full rounded-xl object-contain"
+            />
+            {isFullscreen && showNavigation && (
+              <div className="absolute bottom-4 left-1/2 flex -translate-x-1/2 transform items-center space-x-2 rounded-full bg-black bg-opacity-50 p-2">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={goToPreviousSlide}
+                  disabled={currentSlide === 0}
+                >
+                  <ChevronLeft className="h-4 w-4 text-white" />
+                </Button>
+                <span className="text-sm text-white">
+                  {currentSlide + 1} / {slides.length}
+                </span>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={goToNextSlide}
+                  disabled={currentSlide === slides.length - 1}
+                >
+                  <ChevronRight className="h-4 w-4 text-white" />
+                </Button>
+              </div>
+            )}
+          </div>
+        </div>
+        <div className="border-t p-2">
+          <div className="mb-2 flex items-center justify-center space-x-2 py-2">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={goToPreviousSlide}
+              disabled={currentSlide === 0}
             >
-              <img
-                src={slides[currentSlide].image}
-                alt={slides[currentSlide].title}
-                className="absolute left-0 top-0 h-full w-full rounded-xl object-contain"
-              />
-              {isFullscreen && showNavigation && (
-                <div className="absolute bottom-4 left-1/2 flex -translate-x-1/2 transform items-center space-x-2 rounded-full bg-black bg-opacity-50 p-2">
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={goToPreviousSlide}
-                  >
-                    <ChevronLeft className="h-4 w-4 text-white" />
-                  </Button>
-                  <span className="text-sm text-white">
-                    {currentSlide + 1} / {slides.length}
-                  </span>
-                  <Button variant="ghost" size="icon" onClick={goToNextSlide}>
-                    <ChevronRight className="h-4 w-4 text-white" />
-                  </Button>
-                </div>
-              )}
-            </div>
-          </div>
-          <div className="border-t p-2">
-            <div className="mb-2 flex items-center justify-center space-x-2">
-              <Button variant="ghost" size="icon" onClick={goToPreviousSlide}>
-                <ChevronLeft className="h-4 w-4" />
-              </Button>
-              <Select
-                value={currentSlide.toString()}
-                onValueChange={(value) => setCurrentSlide(parseInt(value))}
-              >
-                <SelectTrigger className="w-[120px]">
-                  <SelectValue placeholder="Select a slide" />
-                </SelectTrigger>
-                <SelectContent>
-                  {slides.map((slide, index) => (
-                    <SelectItem key={slide.id} value={index.toString()}>
-                      {slide.title}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <Button variant="ghost" size="icon" onClick={goToNextSlide}>
-                <ChevronRight className="h-4 w-4" />
-              </Button>
-              <Button variant="ghost" size="icon" onClick={toggleFullscreen}>
-                {isFullscreen ? (
-                  <Minimize className="h-4 w-4" />
-                ) : (
-                  <Maximize className="h-4 w-4" />
-                )}
-              </Button>
-            </div>
-            <ScrollArea className="h-20">
-              <div className="flex justify-center space-x-2 p-1">
+              <ChevronLeft className="h-4 w-4" />
+            </Button>
+            <Select
+              value={currentSlide.toString()}
+              onValueChange={(value) => setCurrentSlide(parseInt(value))}
+            >
+              <SelectTrigger className="w-[120px]">
+                <SelectValue placeholder="Select a slide" />
+              </SelectTrigger>
+              <SelectContent>
                 {slides.map((slide, index) => (
-                  <button
-                    key={slide.id}
-                    className={`focus:outline-none rounded-lg overflow-hidden ${
-                      index === currentSlide ? "ring-2 ring-primary" : ""
-                    }`}
-                    onClick={() => setCurrentSlide(index)}
-                  >
-                    <img
-                      src={slide.image}
-                      alt={slide.title}
-                      className="h-14 w-24 object-cover"
-                    />
-                  </button>
+                  <SelectItem key={slide.id} value={index.toString()}>
+                    {slide.title}
+                  </SelectItem>
                 ))}
-              </div>
-            </ScrollArea>
+              </SelectContent>
+            </Select>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={goToNextSlide}
+              disabled={currentSlide === slides.length - 1}
+            >
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+            <Button variant="ghost" size="icon" onClick={toggleFullscreen}>
+              {isFullscreen ? (
+                <Minimize className="h-4 w-4" />
+              ) : (
+                <Maximize className="h-4 w-4" />
+              )}
+            </Button>
           </div>
-        </section>
+          <div className="relative h-24 overflow-hidden bg-slate-100">
+            <div
+              className="flex space-x-4 p-2 transition-transform duration-300 ease-in-out"
+              style={{
+                transform: `translateX(-${visibleSlideStart * 160}px)`,
+              }}
+            >
+              {slides.map((slide, index) => (
+                <button
+                  key={slide.id}
+                  className={`focus:outline-none rounded-lg overflow-hidden flex-shrink-0 ${
+                    index === currentSlide ? "ring-2 ring-primary" : ""
+                  }`}
+                  onClick={() => setCurrentSlide(index)}
+                >
+                  <img
+                    src={slide.image}
+                    alt={slide.title}
+                    className="h-20 w-36 object-cover"
+                  />
+                </button>
+              ))}
+            </div>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="absolute left-0 top-1/2 -translate-y-1/2 bg-background/80"
+              onClick={() =>
+                setVisibleSlideStart(Math.max(0, visibleSlideStart - 1))
+              }
+              disabled={visibleSlideStart === 0 || currentSlide === 0}
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="absolute right-0 top-1/2 -translate-y-1/2 bg-background/80"
+              onClick={() =>
+                setVisibleSlideStart(
+                  Math.min(slides.length - 3, visibleSlideStart + 1)
+                )
+              }
+              disabled={
+                visibleSlideStart >= slides.length - 3 ||
+                currentSlide === slides.length - 1
+              }
+            >
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+          </div>
+        </div>
+      </section>
 
-        {/* User section */}
-        <section className="flex w-64 flex-col overflow-hidden border-l bg-background p-4">
-          <h2 className="mb-4 text-sm font-semibold text-muted-foreground">
-            Participants ({users.length})
-          </h2>
-          <ScrollArea className="flex-grow">
-            {users.map((user) => (
-              <div key={user.id} className="mb-5 flex items-center space-x-2">
-                <Avatar className="h-9 w-9">
-                  <AvatarImage src={user.avatar} alt={user.name} />
-                  <AvatarFallback>
-                    {user.name
-                      .split(" ")
-                      .map((n) => n[0])
-                      .join("")}
-                  </AvatarFallback>
-                </Avatar>
-                <div className="flex-1">
-                  <p className="text-sm">{user.name}</p>
-                </div>
+      <section className="flex flex-col overflow-hidden border-l bg-background p-4">
+        <h2 className="mb-4 text-sm font-semibold text-muted-foreground">
+          Participants ({users.length})
+        </h2>
+        <ScrollArea className="flex-grow">
+          {users.map((user) => (
+            <div key={user.id} className="mb-5 flex items-center space-x-2">
+              <Avatar className="h-9 w-9">
+                <AvatarImage src={user.avatar} alt={user.name} />
+                <AvatarFallback>
+                  {user.name
+                    .split(" ")
+                    .map((n) => n[0])
+                    .join("")}
+                </AvatarFallback>
+              </Avatar>
+              <div className="flex-1">
+                <p className="text-sm">{user.name}</p>
               </div>
-            ))}
-          </ScrollArea>
-        </section>
-      </div>
+            </div>
+          ))}
+        </ScrollArea>
+      </section>
     </div>
   );
 }
