@@ -38,7 +38,7 @@ export function NewAssessmentForm({ onAssessmentCreated }) {
       metodePelaksanaan: "OFFLINE",
       ruangan: "",
       linkMeeting: null,
-      notaDinas: null,
+      notaDinas: "",
       participants: [],
       isActive: true,
     },
@@ -81,6 +81,7 @@ export function NewAssessmentForm({ onAssessmentCreated }) {
         const isValidStep1 =
           formData.assessment.judul &&
           formData.assessment.materi &&
+          formData.assessment.notaDinas &&
           formData.assessment.metodePelaksanaan &&
           ((formData.assessment.metodePelaksanaan === "OFFLINE" &&
             formData.assessment.ruangan) ||
@@ -112,6 +113,7 @@ export function NewAssessmentForm({ onAssessmentCreated }) {
 
   const handleNextStep = (e) => {
     e.preventDefault();
+    console.log("CEK formData:", formData);
     if (validateStep() && step < 3) {
       setStep(step + 1);
     }
@@ -175,20 +177,13 @@ export function NewAssessmentForm({ onAssessmentCreated }) {
       try {
         const formDataToSend = new FormData();
 
-        // Create the assessment object without the file
+        // Create the assessment object
         const assessmentData = {
           ...formData.assessment,
           createdBy: session?.user?.id,
         };
 
-        // Add the notaDinas file separately if it exists
-        if (formData.assessment.notaDinas) {
-          formDataToSend.append("notaDinas", formData.assessment.notaDinas);
-          // Remove the file from the assessment data
-          delete assessmentData.notaDinas;
-        }
-
-        // Prepare the final payload
+        // Prepare the payload with participants schedule formatted
         const payload = {
           assessment: {
             ...assessmentData,
@@ -200,16 +195,23 @@ export function NewAssessmentForm({ onAssessmentCreated }) {
           evaluators: formData.evaluators,
         };
 
+        // Add the JSON data
+        formDataToSend.append("data", JSON.stringify(payload));
+
+        // Add the file if it exists
+        if (formData.assessment.notaDinas) {
+          formDataToSend.append("notaDinas", formData.assessment.notaDinas);
+        }
+
         console.log("Sending payload:", payload);
-        // formDataToSend.append("data", JSON.stringify(payload));
 
         const response = await fetch(API_ENDPOINTS.ASSESSMENTS.LIST, {
           method: "POST",
           headers: {
             Authorization: `Bearer ${session?.accessToken}`,
-            "Content-Type": "application/json",
+            // Let browser set Content-Type automatically for multipart/form-data
           },
-          body: JSON.stringify(payload),
+          body: formDataToSend,
         });
 
         const result = await response.json();

@@ -62,7 +62,10 @@ export default function AssessmentDetailPage() {
           <AssessmentInfo assessment={assessment} />
         </div>
         <div className="space-y-6">
-          <AssessmentRequirements assessment={assessment} />
+          <AssessmentRequirements
+            assessment={assessment}
+            onSubmit={fetchAssessment}
+          />
         </div>
       </div>
     </motion.div>

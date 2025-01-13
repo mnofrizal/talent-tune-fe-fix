@@ -13,9 +13,11 @@ import { FileText, X } from "lucide-react";
 export function UploadDialog({ open, onOpenChange, onUpload, uploadedPPT }) {
   const [selectedFile, setSelectedFile] = useState(null);
 
-  const handleUpload = () => {
+  const handleUpload = async () => {
     if (selectedFile) {
-      onUpload(selectedFile);
+      const formData = new FormData();
+      formData.append("presentationFile", selectedFile);
+      await onUpload(formData);
       setSelectedFile(null);
     }
   };

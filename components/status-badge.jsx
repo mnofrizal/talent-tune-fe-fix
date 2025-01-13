@@ -20,7 +20,7 @@ const StatusBadge = ({ status = "status", className }) => {
     TALENT_REQUIREMENTS: "Talent Requirements",
     READY_FOR_ASSESSMENT: "Ready for Assessment",
     EVALUATING: "Evaluating",
-    NEED_REVIEW: "Needs Review",
+    NEED_REVIEW: "Need Review",
     DONE: "Done",
     CANCELED: "Canceled",
     RESCHEDULE: "Rescheduled",

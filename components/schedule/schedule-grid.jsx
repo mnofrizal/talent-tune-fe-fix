@@ -159,14 +159,13 @@ export function ScheduleGrid({ assessments = [], search }) {
       "WAITING_CONFIRMATION",
       "TALENT_REQUIREMENTS",
       "READY_FOR_ASSESSMENT",
-      "EVALUATING",
-      "NEED_REVIEW",
-      "RESCHEDULE",
     ].includes(assessment.status)
   );
 
-  const past = filteredAssessments.filter(
-    (assessment) => assessment.status === "DONE"
+  const past = filteredAssessments.filter((assessment) =>
+    ["DONE", "EVALUATING", "NEED_REVIEW", "RESCHEDULE"].includes(
+      assessment.status
+    )
   );
 
   const cancelled = filteredAssessments.filter(

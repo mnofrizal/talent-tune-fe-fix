@@ -225,12 +225,12 @@ export function AssessmentDetails({ formData, setFormData }) {
                 id="notaDinas"
                 name="notaDinas"
                 type="file"
-                accept=".pdf,.doc,.docx"
+                accept=".pdf"
                 onChange={handleInputChange}
                 className="cursor-pointer text-sm file:mr-4 file:rounded-full file:border-0 file:bg-primary file:px-4 file:py-2 file:text-xs file:font-semibold file:text-primary-foreground hover:file:bg-primary/90"
               />
               <p className="text-xs text-muted-foreground">
-                Accepted formats: PDF, DOC, DOCX
+                Accepted format: PDF
               </p>
             </div>
           )}

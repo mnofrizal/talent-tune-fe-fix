@@ -18,5 +18,13 @@ export const API_ENDPOINTS = {
       `${API_BASE_URL}/assessments/${id}/send-invitation`,
     REQUIREMENT_SUBMIT: (id) => `${API_BASE_URL}/assessments/${id}/requirement`,
     START_ASSESSMENT: (id) => `${API_BASE_URL}/assessments/${id}/start`,
+    RESET_STATUS: (id) => `${API_BASE_URL}/assessments/${id}/reset-status`,
+    UPDATE_STATUS: (id) => `${API_BASE_URL}/assessments/${id}/status`,
+  },
+  EVALUATIONS: {
+    LIST: `${API_BASE_URL}/evaluations`,
+    DETAIL: (id) => `${API_BASE_URL}/evaluations/${id}`,
+    SUBMIT: `${API_BASE_URL}/evaluations/submit`,
+    UPDATE: (id) => `${API_BASE_URL}/evaluations/${id}`,
   },
 };

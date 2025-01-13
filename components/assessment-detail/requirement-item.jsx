@@ -7,7 +7,9 @@ import {
   ClipboardList,
   FileUp,
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Button } from "../ui/button";
+import { API_BASE_URL } from "../../config/api";
+
 export function RequirementItem({
   requirement,
   isCompleted,
@@ -15,6 +17,7 @@ export function RequirementItem({
   uploadedPPT,
   openDialog,
   isAttendanceConfirmed,
+  assessment,
 }) {
   return (
     <li className="flex items-start gap-4 rounded-lg px-2 py-4 hover:bg-blue-100/35">
@@ -76,42 +79,44 @@ export function RequirementItem({
                 </Button>
               </div>
             )}
-          <Button
-            variant={isCompleted ? "outline" : "outline"}
-            className="gap-2 border-primary text-primary hover:bg-primary/5 hover:text-primary"
-            disabled={
-              isDisabled ||
-              (requirement.title === "Attendance Confirmation" &&
-                isAttendanceConfirmed)
-            }
-            onClick={openDialog}
-          >
-            {requirement.title === "Questionnaire" && isCompleted ? (
-              <>
-                <Download className="h-4 w-4" />
-                Download PDF
-              </>
-            ) : requirement.title === "Upload PPT" &&
-              (isCompleted || uploadedPPT) ? (
-              <>
-                <Download className="h-4 w-4" />
-                Download
-              </>
-            ) : (
-              <>
-                {requirement.icon === "CheckCircle2" && (
-                  <CheckCircle2 className="h-4 w-4" />
-                )}
-                {requirement.icon === "ClipboardList" && (
-                  <ClipboardList className="h-4 w-4" />
-                )}
-                {requirement.icon === "FileUp" && (
-                  <FileUp className="h-4 w-4" />
-                )}
-                {requirement.buttonText}
-              </>
-            )}
-          </Button>
+          {requirement.title === "Questionnaire" && isCompleted ? (
+            <a
+              href={`${API_BASE_URL}/assessments/download-questionnaire/${assessment?.questionnaireFile?.fileName}`}
+              className="inline-flex items-center gap-2 rounded-md border border-primary px-4 py-2 text-sm font-medium text-primary hover:bg-primary/5"
+            >
+              <Download className="h-4 w-4" />
+              Download PDF
+            </a>
+          ) : requirement.title === "Upload PPT" &&
+            (isCompleted || uploadedPPT) ? (
+            <a
+              href={`${API_BASE_URL}/assessments/download-presentation/${assessment?.presentationFile?.fileName}`}
+              className="inline-flex items-center gap-2 rounded-md border border-primary px-4 py-2 text-sm font-medium text-primary hover:bg-primary/5"
+            >
+              <Download className="h-4 w-4" />
+              Download
+            </a>
+          ) : (
+            <Button
+              variant="outline"
+              className="gap-2 border-primary text-primary hover:bg-primary/5 hover:text-primary"
+              disabled={
+                isDisabled ||
+                (requirement.title === "Attendance Confirmation" &&
+                  isAttendanceConfirmed)
+              }
+              onClick={openDialog}
+            >
+              {requirement.icon === "CheckCircle2" && (
+                <CheckCircle2 className="h-4 w-4" />
+              )}
+              {requirement.icon === "ClipboardList" && (
+                <ClipboardList className="h-4 w-4" />
+              )}
+              {requirement.icon === "FileUp" && <FileUp className="h-4 w-4" />}
+              {requirement.buttonText}
+            </Button>
+          )}
         </div>
       </div>
     </li>

@@ -26,7 +26,7 @@ const AssessmentStatistics = ({ assessments }) => {
     ).length;
 
     const completed = assessments.filter((assessment) =>
-      ["COMPLETED", "CANCELED"].includes(assessment.status)
+      ["DONE", "CANCELED"].includes(assessment.status)
     ).length;
 
     return { total, upcoming, inProgress, completed };

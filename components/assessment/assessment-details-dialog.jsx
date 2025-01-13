@@ -12,10 +12,17 @@ import {
   Trash2,
   File,
   XCircle,
+  DownloadIcon,
+  PencilLine,
+  FileText,
+  FileVideo,
+  FileCheck2,
+  FileCheck,
 } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Alert } from "@/components/ui/alert";
 import StatusBadge from "../status-badge";
+import { API_BASE_URL } from "@/config/api";
 
 const statusOrder = [
   "SCHEDULED",
@@ -23,6 +30,7 @@ const statusOrder = [
   "TALENT_REQUIREMENTS",
   "READY_FOR_ASSESSMENT",
   "EVALUATING",
+  "NEED_REVIEW",
   "DONE",
 ];
 
@@ -59,7 +67,7 @@ const getTimelineSteps = (status) => {
       iconColor: "text-gray-400",
     },
     {
-      status: "DONE",
+      status: "NEED_REVIEW",
       label: "Penilaian Evaluator",
       icon: Circle,
       iconColor: "text-gray-400",
@@ -309,21 +317,135 @@ export default function AssessmentDetailsDialog({
                       </div>
                     </div>
                   </TabsContent>
-                  <TabsContent value="penilaian">Penilaian content</TabsContent>
-                  <TabsContent value="documents" className="pt-2">
-                    <div className="space-y-6">
-                      <Card className="w-full">
-                        <CardContent className="flex items-center justify-between p-3">
-                          <div className="flex items-center gap-3">
-                            <File className="h-5 w-5 text-orange-600" />
-                            <div className="flex flex-col">
-                              <span className="text-sm font-medium">
-                                No documents available
-                              </span>
+                  <TabsContent value="penilaian" className="pt-4">
+                    <div className="space-y-4">
+                      {assessment.evaluations?.map((evaluation) => (
+                        <Card
+                          key={evaluation.id}
+                          className="w-full transition-colors hover:bg-gray-50"
+                        >
+                          <CardContent className="flex items-center justify-between p-4">
+                            <div className="flex items-center">
+                              <PencilLine className="h-14 w-14 rounded-xl bg-orange-100 p-3 text-orange-600" />
+                              <div className="ml-4">
+                                <div className="font-medium">
+                                  Penilaian oleh {evaluation.evaluator?.name}
+                                </div>
+                                <a
+                                  href={`${API_BASE_URL}/assessments/download-penilaian/${evaluation.evaluationFile?.fileName}`}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="mb-2 mt-2 flex items-center text-sm text-blue-500 hover:text-blue-700"
+                                >
+                                  <DownloadIcon className="mr-2 h-4 w-4" />
+                                  Download Penilaian
+                                </a>
+                              </div>
                             </div>
-                          </div>
-                        </CardContent>
-                      </Card>
+                          </CardContent>
+                        </Card>
+                      ))}
+                    </div>
+                  </TabsContent>
+                  <TabsContent value="documents" className="pt-2">
+                    <div className="space-y-4">
+                      {assessment.notaDinas ||
+                      assessment.presentationFile ||
+                      assessment.questionnaireFile ? (
+                        <>
+                          {assessment.notaDinas && (
+                            <Card className="w-full">
+                              <CardContent className="flex items-center justify-between p-3">
+                                <div className="flex items-center gap-3">
+                                  <FileText className="h-14 w-14 rounded-xl bg-orange-100 p-3 text-orange-600" />
+                                  <div className="flex flex-col">
+                                    <span className="text-base font-semibold">
+                                      Nota Dinas
+                                    </span>
+                                    <span className="text-sm text-gray-500">
+                                      {assessment.notaDinas.fileName}
+                                    </span>
+
+                                    <a
+                                      href={`${API_BASE_URL}/assessments/download-nota-dinas/${assessment.notaDinas.fileName}`}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="text-sm text-blue-500 hover:text-blue-700"
+                                    >
+                                      Download
+                                    </a>
+                                  </div>
+                                </div>
+                              </CardContent>
+                            </Card>
+                          )}
+                          {assessment.presentationFile && (
+                            <Card className="w-full">
+                              <CardContent className="flex items-center justify-between p-3">
+                                <div className="flex items-center gap-3">
+                                  <FileVideo className="h-14 w-14 rounded-xl bg-orange-100 p-3 text-orange-600" />
+                                  <div className="flex flex-col">
+                                    <span className="text-base font-semibold">
+                                      PPT
+                                    </span>
+                                    <span className="text-sm text-gray-500">
+                                      {assessment.presentationFile.fileName}
+                                    </span>
+
+                                    <a
+                                      href={`${API_BASE_URL}/assessments/download-presentation/${assessment.presentationFile.fileName}`}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="text-sm text-blue-500 hover:text-blue-700"
+                                    >
+                                      Download
+                                    </a>
+                                  </div>
+                                </div>
+                              </CardContent>
+                            </Card>
+                          )}
+                          {assessment.questionnaireFile && (
+                            <Card className="w-full">
+                              <CardContent className="flex items-center justify-between p-3">
+                                <div className="flex items-center gap-3">
+                                  <FileCheck className="h-14 w-14 rounded-xl bg-orange-100 p-3 text-orange-600" />
+                                  <div className="flex flex-col">
+                                    <span className="text-base font-semibold">
+                                      Kuisioner SMAP
+                                    </span>
+                                    <span className="text-sm text-gray-500">
+                                      {assessment.questionnaireFile.fileName}
+                                    </span>
+
+                                    <a
+                                      href={`${API_BASE_URL}/assessments/download-questionnaire/${assessment.questionnaireFile.fileName}`}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="text-sm text-blue-500 hover:text-blue-700"
+                                    >
+                                      Download
+                                    </a>
+                                  </div>
+                                </div>
+                              </CardContent>
+                            </Card>
+                          )}
+                        </>
+                      ) : (
+                        <Card className="w-full">
+                          <CardContent className="flex items-center justify-between p-3">
+                            <div className="flex items-center gap-3">
+                              <File className="h-5 w-5 text-orange-600" />
+                              <div className="flex flex-col">
+                                <span className="text-sm font-medium">
+                                  No documents available
+                                </span>
+                              </div>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      )}
                     </div>
                   </TabsContent>
                 </Tabs>

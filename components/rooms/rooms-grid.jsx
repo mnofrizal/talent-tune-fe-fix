@@ -31,7 +31,7 @@ const StatusBadge = ({ status }) => {
     TALENT_REQUIREMENTS: "bg-blue-100 text-blue-800",
     READY_FOR_ASSESSMENT: "bg-green-100 text-green-800",
     EVALUATING: "bg-blue-100 text-blue-800",
-    NEED_REVIEW: "bg-blue-100 text-blue-800",
+    NEED_REVIEW: "bg-yellow-100 text-yellow-800",
     DONE: "bg-green-100 text-green-800",
     CANCELED: "bg-red-100 text-red-800",
   };
@@ -42,7 +42,7 @@ const StatusBadge = ({ status }) => {
     TALENT_REQUIREMENTS: "Talent Requirements",
     READY_FOR_ASSESSMENT: "Ready",
     EVALUATING: "in Progress",
-    NEED_REVIEW: "Needs Review",
+    NEED_REVIEW: "Need Review",
     DONE: "Done",
     CANCELED: "Canceled",
     RESCHEDULE: "Rescheduled",
@@ -62,8 +62,8 @@ const StatusBadge = ({ status }) => {
 // Status grouping configuration
 const STATUS_GROUPS = {
   scheduled: ["READY_FOR_ASSESSMENT"],
-  ongoing: ["EVALUATING", "NEED_REVIEW"],
-  complete: ["DONE", "CANCELED"],
+  ongoing: ["EVALUATING"],
+  complete: ["NEED_REVIEW", "DONE", "CANCELED"],
 };
 
 const AvatarGroup = ({ evaluators }) => {

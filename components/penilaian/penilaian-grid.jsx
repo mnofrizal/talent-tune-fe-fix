@@ -72,14 +72,6 @@ const AssessmentCard = ({ assessment }) => (
               {assessment.ruangan && `- ${assessment.ruangan}`}
             </p>
           </div>
-          {assessment.evaluations && assessment.evaluations[0]?.scores && (
-            <div>
-              <h4 className="text-sm font-medium">Score</h4>
-              <p className="text-sm font-semibold text-primary">
-                {assessment.evaluations[0].scores}/100
-              </p>
-            </div>
-          )}
         </div>
 
         <div className="mt-6">

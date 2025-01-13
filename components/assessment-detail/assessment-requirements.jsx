@@ -10,11 +10,13 @@ import { QuestionnaireDialog } from "./questionnaire-dialog";
 import { API_ENDPOINTS } from "@/config/api";
 import { useAuth } from "@/hooks/use-auth";
 
-export function AssessmentRequirements({ assessment }) {
+export function AssessmentRequirements({ assessment, onSubmit }) {
   const { session } = useAuth();
   const [openDialog, setOpenDialog] = useState(null);
   const [completedTasks, setCompletedTasks] = useState([]);
-  const [uploadedPPT, setUploadedPPT] = useState(assessment.presentationFile);
+  const [uploadedPPT, setUploadedPPT] = useState(
+    assessment.presentationFile?.fileName || null
+  );
   const [confirmedAttendance, setConfirmedAttendance] = useState(
     assessment.attendanceConfirmation
   );
@@ -25,7 +27,7 @@ export function AssessmentRequirements({ assessment }) {
     !!assessment.questionnaireResponses
   );
 
-  // Function to update assessment on the server
+  // Function to update assessment on the server and refresh data
   const updateAssessment = async (data) => {
     try {
       const response = await fetch(
@@ -47,6 +49,9 @@ export function AssessmentRequirements({ assessment }) {
       if (!response.ok) {
         throw new Error("Failed to update assessment");
       }
+
+      // Call the onSubmit prop to refresh assessment data
+      onSubmit();
     } catch (error) {
       console.error("Error updating assessment:", error);
     }
@@ -95,7 +100,7 @@ export function AssessmentRequirements({ assessment }) {
       buttonText: "Upload",
       dialogTitle: "Upload Presentation",
       isCompleted: assessment.presentationFile || uploadedPPT,
-      presentationFile: assessment.presentationFile,
+      presentationFile: assessment.presentationFile?.fileName,
       isDisabled: !assessment.attendanceConfirmation && !confirmedAttendance,
     },
   ];
@@ -110,35 +115,67 @@ export function AssessmentRequirements({ assessment }) {
     const isAttending = value === "Hadir";
     setConfirmedAttendance(value);
 
-    // Update server with attendance confirmation
-    await updateAssessment({
-      attendanceConfirmation: isAttending,
-      presentationFile: uploadedPPT || assessment.presentationFile || "",
-      questionnaireResponses: questionnaireResponses,
-    });
+    try {
+      // Update server with attendance confirmation
+      await updateAssessment({
+        attendanceConfirmation: isAttending,
+        presentationFile:
+          uploadedPPT || assessment.presentationFile?.fileName || "",
+        questionnaireResponses: questionnaireResponses,
+      });
 
-    if (value === "Tidak Hadir") {
-      // If not attending, auto-complete all requirements
-      setCompletedTasks(requirements.map((req) => req.title));
-    } else {
-      completeTask("Attendance Confirmation");
+      if (value === "Tidak Hadir") {
+        // If not attending, auto-complete all requirements
+        setCompletedTasks(requirements.map((req) => req.title));
+      } else {
+        completeTask("Attendance Confirmation");
+      }
+    } catch (error) {
+      console.error("Error submitting attendance:", error);
+    } finally {
+      setOpenDialog(null);
     }
-    setOpenDialog(null);
   };
 
-  const handlePPTUpload = async (file) => {
-    setUploadedPPT(file.name);
-    // Update server with PPT file
-    await updateAssessment({
-      presentationFile: file.name,
-      attendanceConfirmation:
+  const handlePPTUpload = async (formData) => {
+    try {
+      // Append current attendance and questionnaire data
+      formData.append(
+        "attendanceConfirmation",
         confirmedAttendance === "Hadir" ||
-        assessment.attendanceConfirmation ||
-        false,
-      questionnaireResponses: questionnaireResponses,
-    });
-    completeTask("Upload PPT");
-    setOpenDialog(null);
+          assessment.attendanceConfirmation ||
+          false
+      );
+      formData.append(
+        "questionnaireResponses",
+        questionnaireResponses ? JSON.stringify(questionnaireResponses) : ""
+      );
+
+      const response = await fetch(
+        API_ENDPOINTS.ASSESSMENTS.REQUIREMENT_SUBMIT(assessment.id),
+        {
+          method: "PUT",
+          headers: {
+            Authorization: `Bearer ${session?.accessToken}`,
+          },
+          body: formData,
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to upload presentation file");
+      }
+
+      const data = await response.json();
+      setUploadedPPT(data.presentationFile?.fileName);
+      completeTask("Upload PPT");
+      setOpenDialog(null);
+
+      // Call onSubmit prop to refresh assessment data
+      onSubmit();
+    } catch (error) {
+      console.error("Error uploading presentation:", error);
+    }
   };
 
   const handleQuestionnaireComplete = async (responses) => {
@@ -147,7 +184,8 @@ export function AssessmentRequirements({ assessment }) {
     // Update server with questionnaire responses
     await updateAssessment({
       questionnaireResponses: responses,
-      presentationFile: uploadedPPT || assessment.presentationFile || "",
+      presentationFile:
+        uploadedPPT || assessment.presentationFile?.fileName || "",
       attendanceConfirmation:
         confirmedAttendance === "Hadir" ||
         assessment.attendanceConfirmation ||
@@ -207,6 +245,7 @@ export function AssessmentRequirements({ assessment }) {
                 confirmedAttendance === "Hadir" ||
                 assessment.attendanceConfirmation
               }
+              assessment={assessment}
             />
           ))}
         </ul>
