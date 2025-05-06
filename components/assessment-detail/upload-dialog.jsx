@@ -8,17 +8,25 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
-import { FileText, X } from "lucide-react";
+import { FileText, Loader2, X } from "lucide-react";
 
 export function UploadDialog({ open, onOpenChange, onUpload, uploadedPPT }) {
   const [selectedFile, setSelectedFile] = useState(null);
+  const [isUploading, setIsUploading] = useState(false);
 
   const handleUpload = async () => {
     if (selectedFile) {
-      const formData = new FormData();
-      formData.append("presentationFile", selectedFile);
-      await onUpload(formData);
-      setSelectedFile(null);
+      try {
+        setIsUploading(true);
+        const formData = new FormData();
+        formData.append("presentationFile", selectedFile);
+        await onUpload(formData);
+        setSelectedFile(null);
+      } catch (error) {
+        console.error("Upload failed:", error);
+      } finally {
+        setIsUploading(false);
+      }
     }
   };
 
@@ -32,7 +40,7 @@ export function UploadDialog({ open, onOpenChange, onUpload, uploadedPPT }) {
         <DialogHeader>
           <DialogTitle>Upload Presentation</DialogTitle>
           <DialogDescription>
-            Upload your PowerPoint presentation for the assessment.
+            Unggah presentasi PowerPoint Anda untuk assesment.
           </DialogDescription>
         </DialogHeader>
         <div className="mt-2 space-y-4">
@@ -76,8 +84,8 @@ export function UploadDialog({ open, onOpenChange, onUpload, uploadedPPT }) {
           )}
           {uploadedPPT && !selectedFile && (
             <p className="text-sm text-muted-foreground">
-              A presentation has already been uploaded. Select a new file to
-              replace it.
+              File presentasi telah diunggah. Pilih file baru untuk
+              menggantinya.
             </p>
           )}
         </div>
@@ -86,8 +94,18 @@ export function UploadDialog({ open, onOpenChange, onUpload, uploadedPPT }) {
             <Button variant="outline" onClick={() => onOpenChange(false)}>
               Cancel
             </Button>
-            <Button onClick={handleUpload} disabled={!selectedFile}>
-              Submit
+            <Button
+              onClick={handleUpload}
+              disabled={!selectedFile || isUploading}
+            >
+              {isUploading ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Uploading
+                </>
+              ) : (
+                "Submit"
+              )}
             </Button>
           </div>
         </DialogFooter>

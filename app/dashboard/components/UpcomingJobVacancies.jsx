@@ -1,5 +1,5 @@
 import { Card, CardContent } from "@/components/ui/card";
-import { Tally1Icon } from 'lucide-react';
+import { Tally1Icon } from "lucide-react";
 
 const jobVacancies = [
   "Assistant Manager Sistem Informasi",
@@ -24,7 +24,7 @@ export default function UpcomingJobVacancies() {
                   <h4 className="text-sm font-medium">{job}</h4>
                 </div>
                 <span className="inline-flex items-center rounded-lg bg-orange-100 px-2.5 py-0.5 text-xs font-medium text-orange-800">
-                  Retirement
+                  Pensiun
                 </span>
               </div>
             ))}
@@ -34,4 +34,3 @@ export default function UpcomingJobVacancies() {
     </Card>
   );
 }
-

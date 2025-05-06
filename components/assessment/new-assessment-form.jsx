@@ -13,7 +13,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Plus } from "lucide-react";
+import { Loader2, Plus } from "lucide-react";
 import {
   Card,
   CardContent,
@@ -28,6 +28,7 @@ export function NewAssessmentForm({ onAssessmentCreated }) {
   const { session } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
   const [step, setStep] = useState(1);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [evaluators, setEvaluators] = useState();
   const [candidates, setCandidates] = useState();
   const [formData, setFormData] = useState({
@@ -174,6 +175,7 @@ export function NewAssessmentForm({ onAssessmentCreated }) {
     console.log("Submitting form data:", formData);
 
     if (validateStep() && step === 3) {
+      setIsSubmitting(true);
       try {
         const formDataToSend = new FormData();
 
@@ -250,6 +252,7 @@ export function NewAssessmentForm({ onAssessmentCreated }) {
           });
         }
       } catch (error) {
+        setIsSubmitting(false);
         console.error("Failed to create assessment:", error);
         toast({
           variant: "destructive",
@@ -257,6 +260,8 @@ export function NewAssessmentForm({ onAssessmentCreated }) {
           description: "Failed to create assessment",
           duration: 3000,
         });
+      } finally {
+        setIsSubmitting(false);
       }
     }
   };
@@ -265,7 +270,7 @@ export function NewAssessmentForm({ onAssessmentCreated }) {
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
         <Button>
-          <Plus className="mr-2 h-4 w-4" /> New Assessment
+          <Plus className="mr-2 h-4 w-4" /> Buat Assessment
         </Button>
       </DialogTrigger>
       <DialogContent className="rounded-2xl sm:max-w-[425px] md:max-w-[700px]">
@@ -309,13 +314,20 @@ export function NewAssessmentForm({ onAssessmentCreated }) {
                 ) : (
                   <Button
                     type="submit"
-                    disabled={!validateStep()}
+                    disabled={!validateStep() || isSubmitting}
                     onClick={(e) => {
                       console.log("Submit button clicked");
                       handleSubmit(e);
                     }}
                   >
-                    Submit
+                    {isSubmitting ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Submitting
+                      </>
+                    ) : (
+                      "Submit"
+                    )}
                   </Button>
                 )}
               </div>

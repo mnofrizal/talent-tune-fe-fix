@@ -58,7 +58,7 @@ const AssessmentStatistics = ({ assessments }) => {
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <p className="text-sm font-medium text-muted-foreground">
-                Scheduled Assessments
+                Terjadwal
               </p>
               <Calendar className="ml-2 h-4 w-4 text-blue-500" />
             </div>
@@ -76,7 +76,7 @@ const AssessmentStatistics = ({ assessments }) => {
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <p className="text-sm font-medium text-muted-foreground">
-                In Progress Assessments
+                In Progress
               </p>
               <Clock className="ml-2 h-4 w-4 text-yellow-500" />
             </div>
@@ -94,7 +94,7 @@ const AssessmentStatistics = ({ assessments }) => {
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <p className="text-sm font-medium text-muted-foreground">
-                Completed Assessments
+                Total Selesai
               </p>
               <CheckCircle className="ml-2 h-4 w-4 text-green-500" />
             </div>

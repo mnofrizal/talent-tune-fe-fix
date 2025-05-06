@@ -81,7 +81,7 @@ export function AssessmentRequirements({ assessment, onSubmit }) {
     {
       title: "Attendance Confirmation",
       icon: "CheckCircle2",
-      buttonText: "Confirm",
+      buttonText: "Konfirmasi",
       dialogTitle: "Confirm Attendance",
       isCompleted: assessment.attendanceConfirmation || confirmedAttendance,
       isDisabled: false,
@@ -89,7 +89,7 @@ export function AssessmentRequirements({ assessment, onSubmit }) {
     {
       title: "Questionnaire",
       icon: "ClipboardList",
-      buttonText: "Start Questionnaire",
+      buttonText: "Mulai Kuisioner",
       dialogTitle: "Assessment Questionnaire",
       isCompleted: questionnaireResponses || questionnaireCompleted,
       isDisabled: !assessment.attendanceConfirmation && !confirmedAttendance,

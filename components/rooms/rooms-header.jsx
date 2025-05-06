@@ -10,7 +10,7 @@ export function RoomsHeader() {
         animate={{ opacity: 1, x: 0 }}
         className="text-3xl font-bold tracking-tight"
       >
-        Assessment Rooms
+        Ruang Assessment
       </motion.h1>
     </>
   );

@@ -17,9 +17,9 @@ export default function RecentAssessmentsTable({ assessments, loading }) {
                 <th className="p-4 text-left">
                   <Checkbox />
                 </th>
-                <th className="p-4 text-left font-medium">Employee</th>
+                <th className="p-4 text-left font-medium">Nama</th>
                 <th className="p-4 text-left font-medium">Status</th>
-                <th className="p-4 text-left font-medium">Date</th>
+                <th className="p-4 text-left font-medium">Tanggal</th>
                 <th className="p-4 text-left font-medium">Assessment</th>
                 <th className="p-4 text-left font-medium">Progress</th>
                 <th className="p-4 text-left font-medium">Evaluators</th>
@@ -70,7 +70,7 @@ export default function RecentAssessmentsTable({ assessments, loading }) {
                               : "text-yellow-500"
                           }
                         >
-                          {item.attendanceConfirmation ? "Attend" : "Pending"}
+                          {item.attendanceConfirmation ? "Hadir" : "Pending"}
                         </span>
                       </div>
                     </td>

@@ -54,11 +54,11 @@ export function RequirementItem({
         </h3>
         <p className="mt-1 text-sm text-muted-foreground">
           {requirement.title === "Attendance Confirmation" &&
-            "Confirm your presence for the assessment."}
+            "Konfirmasikan kehadiran Anda untuk penilaian."}
           {requirement.title === "Questionnaire" &&
-            "Complete the pre-assessment questionnaire."}
+            "Lengkapi kuesioner pra-penilaian."}
           {requirement.title === "Upload PPT" &&
-            "Upload your presentation slides for review."}
+            "Unggah slide presentasi Anda untuk ditinjau."}
         </p>
         <div className="mt-3">
           {requirement.title === "Upload PPT" &&

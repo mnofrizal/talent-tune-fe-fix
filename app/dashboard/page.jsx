@@ -72,10 +72,10 @@ export default function DashboardPage() {
         <div className="col-span-4 flex items-start justify-between">
           <div className="space-y-1">
             <h1 className="text-4xl font-medium tracking-tight">
-              Welcome back, {user?.name}
+              Selamat datang, {user?.name}
             </h1>
             <p className="text-lg text-muted-foreground">
-              Here's an overview of your assessment activities
+              Berikut adalah ringkasan kegiatan fit and proper
             </p>
           </div>
           <Link href="/dashboard/assessments">
@@ -83,7 +83,7 @@ export default function DashboardPage() {
               size="lg"
               className="rounded-xl bg-primary text-primary-foreground hover:bg-primary/90"
             >
-              Go to Assessments
+              Ke Assessments
             </Button>
           </Link>
         </div>

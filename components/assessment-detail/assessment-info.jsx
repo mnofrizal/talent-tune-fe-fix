@@ -41,9 +41,7 @@ export function AssessmentInfo({ assessment }) {
                 </AvatarFallback>
               </Avatar>
               <div>
-                <div className="text-sm text-muted-foreground">
-                  Participant name
-                </div>
+                <div className="text-sm text-muted-foreground">Kandidat</div>
                 <div className="text-lg font-semibold">
                   {assessment?.participant?.name}
                 </div>
@@ -67,7 +65,7 @@ export function AssessmentInfo({ assessment }) {
             </CardTitle>
           </div>
           <CardDescription className="text-base">
-            Information about your upcoming assessment
+            Informasi tentang assesment Anda yang akan datang
           </CardDescription>
         </CardHeader>
 
@@ -127,7 +125,7 @@ export function AssessmentInfo({ assessment }) {
 
         <CardHeader className="pb-2">
           <CardTitle className="text-xl font-semibold">Evaluators</CardTitle>
-          <CardDescription>Meet your assessment team</CardDescription>
+          <CardDescription>Tim penilaian assessment</CardDescription>
         </CardHeader>
 
         <CardContent>

@@ -168,7 +168,7 @@ export default function AssessmentDetailsDialog({
               <div className="col-span-4 space-y-4">
                 <div className="grid grid-cols-2 gap-4 rounded-lg bg-gray-50 p-4 md:grid-cols-3">
                   <div className="space-y-2">
-                    <div className="text-xs text-gray-500">ASSIGNED TO</div>
+                    <div className="text-xs text-gray-500">KANDIDAT</div>
                     <div className="flex items-center gap-2">
                       <Avatar className="h-6 w-6">
                         <AvatarFallback>
@@ -200,7 +200,7 @@ export default function AssessmentDetailsDialog({
                       value="history"
                       className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent"
                     >
-                      Order History
+                      Detail
                     </TabsTrigger>
                     <TabsTrigger
                       value="evaluators"
@@ -238,7 +238,7 @@ export default function AssessmentDetailsDialog({
                           </div>
                           <div className="space-y-1">
                             <div className="text-sm text-gray-500">
-                              Schedule
+                              Tanggal Pelaksanaan
                             </div>
                             <div className="text-sm font-medium">
                               {new Date(assessment.schedule).toLocaleString()}

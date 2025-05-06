@@ -245,7 +245,7 @@ export function RoomsGrid({ search, status, onStartRoom, assessments }) {
                 >
                   {STATUS_GROUPS.scheduled.includes(room.status) ? (
                     <Button size="sm" onClick={() => handleRoomAction(room)}>
-                      Start Now
+                      Mulai Sekarang
                     </Button>
                   ) : (
                     <Button
